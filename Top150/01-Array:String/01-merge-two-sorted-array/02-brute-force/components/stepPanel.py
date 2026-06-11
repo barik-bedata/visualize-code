@@ -62,15 +62,22 @@ class StepPanel:
 
         rows_vgroup.arrange(DOWN, buff=0.35, aligned_edge=LEFT)
 
+        # ── Fix: Proper vertical divider line ──
+        top_y    = rows_vgroup.get_top()[1]    + 0.1
+        bottom_y = rows_vgroup.get_bottom()[1] - 0.1
+        line_x   = rows_vgroup.get_left()[0]   - 0.4
+
         divider = Line(
-            start=rows_vgroup.get_top()    + LEFT * 0.4 + UP   * 0.1,
-            end  =rows_vgroup.get_bottom() + LEFT * 0.4 + DOWN * 0.1,
+            start=np.array([line_x, top_y,    0]),
+            end  =np.array([line_x, bottom_y, 0]),
             stroke_width=0.8,
             color=self._C_INACTIVE,
         ).set_opacity(0.3)
 
         self._group = VGroup(divider, rows_vgroup)
-        self._group.to_edge(RIGHT, buff=0.5)
+
+        # ── Fix: আরেকটু left এ আনা (buff বাড়ানো) ──
+        self._group.to_edge(RIGHT, buff=1.2)
         self._group.move_to([self._group.get_center()[0], 0, 0])
 
     def add_complexity(self, time_text: str, space_text: str):
