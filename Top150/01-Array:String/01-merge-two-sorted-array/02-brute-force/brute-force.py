@@ -28,7 +28,6 @@ class BruteForce(Scene):
             ("Sort nums1",         "sort(nums1, m+n)"),
             ("Done",               "in-place, sorted"),
         ])
-        panel.add_complexity("O((m+n) log(m+n))", "O(1)")
         panel.show()
 
         # ─────────────────────────────────────────────────────────────

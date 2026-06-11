@@ -1,12 +1,26 @@
 from manim import *
+from abc import ABC, abstractmethod
 
 
-class StepPanel:
+class IStepPanel(ABC):
+    @abstractmethod
+    def show(self, run_time: float) -> None: pass
+    @abstractmethod
+    def hide(self, run_time: float) -> None: pass
+    @abstractmethod
+    def activate(self, index: int, run_time: float) -> None: pass
+    @abstractmethod
+    def complete(self, index: int, run_time: float) -> None: pass
+    @abstractmethod
+    def deactivate(self, index: int, run_time: float) -> None: pass
+
+
+class StepPanel(IStepPanel):
     _C_ACTIVE   = "#1A73E8"
-    _C_DONE     = "#198754"
-    _C_INACTIVE = "#424242"
-    _C_TEXT     = "#E0E0E0"
-    _C_SUB      = "#B0B0B0"
+    _C_DONE     = "#22C55E"
+    _C_INACTIVE = "#6B7280"
+    _C_TEXT     = "#F1F5F9"
+    _C_SUB      = "#94A3B8"
 
     def __init__(self, scene: Scene, typo, steps: list[tuple[str, str]]):
         self.scene   = scene
@@ -62,7 +76,6 @@ class StepPanel:
 
         rows_vgroup.arrange(DOWN, buff=0.35, aligned_edge=LEFT)
 
-        # ── Fix: Proper vertical divider line ──
         top_y    = rows_vgroup.get_top()[1]    + 0.1
         bottom_y = rows_vgroup.get_bottom()[1] - 0.1
         line_x   = rows_vgroup.get_left()[0]   - 0.4
@@ -75,30 +88,22 @@ class StepPanel:
         ).set_opacity(0.3)
 
         self._group = VGroup(divider, rows_vgroup)
-
-        # ── Fix: আরেকটু left এ আনা (buff বাড়ানো) ──
         self._group.to_edge(RIGHT, buff=1.2)
         self._group.move_to([self._group.get_center()[0], 0, 0])
 
-    def add_complexity(self, time_text: str, space_text: str):
-        t_badge = self._make_badge(f"Time  {time_text}", "#1e2a1e", "#4CAF50", "#2d4a2d")
-        s_badge = self._make_badge(f"Space {space_text}", "#1e2a1e", "#1A73E8", "#1a3a4a")
-        self._badges = VGroup(t_badge, s_badge).arrange(DOWN, buff=0.15, aligned_edge=LEFT)
-        self._badges.next_to(self._group, DOWN, buff=0.4, aligned_edge=LEFT)
-
-    def show(self, run_time: float = 0.7):
+    def show(self, run_time: float = 0.7) -> None:
         anims = [FadeIn(self._group, shift=LEFT * 0.2)]
         if self._badges:
             anims.append(FadeIn(self._badges, shift=LEFT * 0.2))
         self.scene.play(*anims, run_time=run_time)
 
-    def hide(self, run_time: float = 0.5):
+    def hide(self, run_time: float = 0.5) -> None:
         anims = [FadeOut(self._group)]
         if self._badges:
             anims.append(FadeOut(self._badges))
         self.scene.play(*anims, run_time=run_time)
 
-    def activate(self, index: int, run_time: float = 0.4):
+    def activate(self, index: int, run_time: float = 0.4) -> None:
         r = self._rows[index]
         self.scene.play(
             r["row"].animate.set_opacity(1),
@@ -108,7 +113,7 @@ class StepPanel:
             run_time=run_time,
         )
 
-    def complete(self, index: int, run_time: float = 0.4):
+    def complete(self, index: int, run_time: float = 0.4) -> None:
         r = self._rows[index]
         checkmark = Text(
             "✓",
@@ -128,7 +133,7 @@ class StepPanel:
         )
         r["num"] = checkmark
 
-    def deactivate(self, index: int, run_time: float = 0.3):
+    def deactivate(self, index: int, run_time: float = 0.3) -> None:
         r = self._rows[index]
         self.scene.play(r["row"].animate.set_opacity(0.3), run_time=run_time)
 
