@@ -8,8 +8,6 @@ from components.stepPanel import StepPanel
 
 config.flush_cache = True
 
-
-
 class BruteForce(Scene):
 
     def construct(self):
@@ -21,17 +19,7 @@ class BruteForce(Scene):
         tracker.screen_brute_force("Brute Force")
 
         # ─────────────────────────────────────────────────────────────
-        #  STEP PANEL  (right side)
-        # ─────────────────────────────────────────────────────────────
-        panel = StepPanel(scene=self, typo=typo, steps=[
-            ("Copy nums2 → nums1", "fill empty slots"),
-            ("Sort nums1",         "sort(nums1, m+n)"),
-            ("Done",               "in-place, sorted"),
-        ])
-        panel.show()
-
-        # ─────────────────────────────────────────────────────────────
-        #  BUILD nums1 ROW
+        #  BUILD nums1 ROW  (centered first)
         # ─────────────────────────────────────────────────────────────
         nums1_lbl = Text("nums1 = ", font=typo.font_code(), font_size=20, color=typo.color_white())
         vals1 = [1, 2, 3, 0, 0, 0]
@@ -55,8 +43,7 @@ class BruteForce(Scene):
         m_text.move_to(m_rect.get_center())
         m_box = VGroup(m_rect, m_text)
 
-        row1 = VGroup(nums1_group, m_box).arrange(RIGHT, buff=0.8, aligned_edge=UP)
-        row1.move_to(UP * 1.5 + LEFT * 1.5)
+        row1 = VGroup(nums1_group, m_box).arrange(RIGHT, buff=0.4, aligned_edge=UP)
 
         # ─────────────────────────────────────────────────────────────
         #  BUILD nums2 ROW
@@ -78,15 +65,46 @@ class BruteForce(Scene):
         n_text.move_to(n_rect.get_center())
         n_box = VGroup(n_rect, n_text)
 
-        row2 = VGroup(nums2_group, n_box).arrange(RIGHT, buff=3.2, aligned_edge=UP)
-        row2.next_to(row1, DOWN, buff=0.5, aligned_edge=LEFT)
+        row2 = VGroup(nums2_group, n_box).arrange(RIGHT, buff=2.8, aligned_edge=UP)
 
+        # ── Stack rows, center on screen ──
+        content = VGroup(row1, row2).arrange(DOWN, buff=0.5, aligned_edge=LEFT)
+        content.move_to(ORIGIN)
+
+        # ─────────────────────────────────────────────────────────────
+        #  FADE IN centered
+        # ─────────────────────────────────────────────────────────────
         self.play(
             FadeIn(row1, shift=RIGHT * 0.3),
             FadeIn(row2, shift=RIGHT * 0.3),
             run_time=1.2,
         )
-        self.wait(2.0)
+        self.wait(0.8)
+
+        # ─────────────────────────────────────────────────────────────
+        #  ANIMATE LEFT  →  make room for side panel
+        # ─────────────────────────────────────────────────────────────
+        self.play(
+            content.animate.to_edge(LEFT, buff=0.6),
+            run_time=0.7,
+            rate_func=smooth,
+        )
+
+        # ─────────────────────────────────────────────────────────────
+        #  STEP PANEL  — aligned to nums1 top border, right side
+        # ─────────────────────────────────────────────────────────────
+        panel = StepPanel(scene=self, typo=typo, steps=[
+            ("Copy nums2 → nums1", "fill empty slots"),
+            ("Sort nums1",         "sort(nums1, m+n)"),
+            ("Done",               "in-place, sorted"),
+        ])
+
+        # Align panel top to nums1 row top
+        nums1_top_y = row1.get_top()[1]
+        panel._group.set_y(nums1_top_y - panel._group.get_top()[1] + panel._group.get_y())
+
+        panel.show()
+        self.wait(1.2)
 
         # ─────────────────────────────────────────────────────────────
         #  STEP 1 — Copy nums2 → nums1
@@ -150,7 +168,6 @@ class BruteForce(Scene):
         # ─────────────────────────────────────────────────────────────
         panel.activate(1)
 
-        # brief sort label
         sort_label = Text(
             "sort(nums1, m+n)",
             font=typo.font_code(),
@@ -161,10 +178,8 @@ class BruteForce(Scene):
         self.play(FadeIn(sort_label, shift=UP * 0.15), run_time=0.5)
         self.wait(0.6)
 
-        # nums1 is [1,2,3,2,5,6] → one swap: index 2 ↔ index 3
         self.play(FadeOut(sort_label), run_time=0.3)
         swap_animator.animate_swap(cells1[2], cells1[3])
-        # result: [1, 2, 2, 3, 5, 6] ✓
 
         panel.complete(1)
 

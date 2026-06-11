@@ -16,11 +16,11 @@ class IStepPanel(ABC):
 
 
 class StepPanel(IStepPanel):
-    _C_ACTIVE   = "#1A73E8"
-    _C_DONE     = "#22C55E"
-    _C_INACTIVE = "#6B7280"
-    _C_TEXT     = "#F1F5F9"
-    _C_SUB      = "#94A3B8"
+    _C_ACTIVE   = "#60A5FA"  # bright sky-blue  — পরিষ্কার দেখা যাবে
+    _C_DONE     = "#4ADE80"  # bright green      — পরিষ্কার দেখা যাবে
+    _C_INACTIVE = "#6B7280"  # mid gray          — readable
+    _C_TEXT     = "#F1F5F9"  # near-white        — sharp
+    _C_SUB      = "#94A3B8"  # slate             — muted but readable
 
     def __init__(self, scene: Scene, typo, steps: list[tuple[str, str]]):
         self.scene   = scene
@@ -36,7 +36,7 @@ class StepPanel(IStepPanel):
 
         for i, (title, subtitle) in enumerate(self.steps):
             circle = Circle(
-                radius=0.18,
+                radius=0.22,        # একটু বড় — badge ভালো দেখাবে
                 color=self._C_INACTIVE,
                 stroke_width=1.5,
                 fill_opacity=0,
@@ -44,7 +44,7 @@ class StepPanel(IStepPanel):
             num = Text(
                 str(i + 1),
                 font=self.typo.font_ui(),
-                font_size=13,
+                font_size=16,       # বড় করা হয়েছে
                 color=self._C_INACTIVE,
             ).move_to(circle.get_center())
             badge = VGroup(circle, num)
@@ -52,17 +52,17 @@ class StepPanel(IStepPanel):
             title_text = Text(
                 title,
                 font=self.typo.font_code(),
-                font_size=14,
+                font_size=17,       # বড় করা হয়েছে
                 color=self._C_TEXT,
             )
             sub_text = Text(
                 subtitle,
                 font=self.typo.font_code(),
-                font_size=11,
+                font_size=13,       # বড় করা হয়েছে
                 color=self._C_SUB,
             )
-            text_col = VGroup(title_text, sub_text).arrange(DOWN, buff=0.06, aligned_edge=LEFT)
-            row = VGroup(badge, text_col).arrange(RIGHT, buff=0.2, aligned_edge=UP)
+            text_col = VGroup(title_text, sub_text).arrange(DOWN, buff=0.08, aligned_edge=LEFT)
+            row = VGroup(badge, text_col).arrange(RIGHT, buff=0.25, aligned_edge=UP)
             row.set_opacity(0.3)
 
             self._rows.append({
@@ -74,21 +74,21 @@ class StepPanel(IStepPanel):
             })
             rows_vgroup.add(row)
 
-        rows_vgroup.arrange(DOWN, buff=0.35, aligned_edge=LEFT)
+        rows_vgroup.arrange(DOWN, buff=0.4, aligned_edge=LEFT)
 
         top_y    = rows_vgroup.get_top()[1]    + 0.1
         bottom_y = rows_vgroup.get_bottom()[1] - 0.1
-        line_x   = rows_vgroup.get_left()[0]   - 0.4
+        line_x   = rows_vgroup.get_left()[0]   - 0.45
 
         divider = Line(
             start=np.array([line_x, top_y,    0]),
             end  =np.array([line_x, bottom_y, 0]),
-            stroke_width=0.8,
+            stroke_width=1.0,
             color=self._C_INACTIVE,
-        ).set_opacity(0.3)
+        ).set_opacity(0.35)
 
         self._group = VGroup(divider, rows_vgroup)
-        self._group.to_edge(RIGHT, buff=1.2)
+        self._group.to_edge(RIGHT, buff=1.8)   # আরো left এ আনা হয়েছে
         self._group.move_to([self._group.get_center()[0], 0, 0])
 
     def show(self, run_time: float = 0.7) -> None:
@@ -118,8 +118,8 @@ class StepPanel(IStepPanel):
         checkmark = Text(
             "✓",
             font=self.typo.font_ui(),
-            font_size=13,
-            color="#FFFFFF",
+            font_size=16,
+            color="#121212",        # dark tick — green bg এ contrast ভালো
         ).move_to(r["circle"].get_center())
 
         self.scene.play(
@@ -128,7 +128,7 @@ class StepPanel(IStepPanel):
             FadeOut(r["num"]),
             FadeIn(checkmark),
             r["title"].animate.set_color(self._C_DONE),
-            r["row"].animate.set_opacity(0.6),
+            r["row"].animate.set_opacity(0.9),
             run_time=run_time,
         )
         r["num"] = checkmark
