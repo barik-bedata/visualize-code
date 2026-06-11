@@ -76,6 +76,7 @@ class Statement(Scene):
         m_highlighter.create(m_box, 0, 0)
         m_highlighter.effect_highlight_show()
 
+        # ── highlight first m real cells ────────────────────────────────
         nums1_highlighter = RangeHighlighter(self, typo.color_yellow())
         nums1_highlighter.create(cells1, 0, 2)
         nums1_highlighter.effect_highlight_show()
@@ -85,7 +86,7 @@ class Statement(Scene):
         m_highlighter.effect_highlight_hide()
         self.wait(2)
 
-        # ── highlight empty slots ────────────────────────────────────
+        # ── highlight empty slots in nums1 ────────────────────────────────────
         nums1_highlighter = RangeHighlighter(self, typo.color_blue_gray())
         nums1_highlighter.create(cells1, 3, 5)
         nums1_highlighter.effect_highlight_show()
@@ -97,6 +98,7 @@ class Statement(Scene):
         n_highlighter.create(n_box, 0, 0)
         n_highlighter.effect_highlight_show()
 
+        # ── highlight first n real cells in nums2 ────────────────────────────────
         nums2_highlighter = RangeHighlighter(self, typo.color_yellow())
         nums2_highlighter.create(cells2, 0, 2)
         nums2_highlighter.effect_highlight_show()
