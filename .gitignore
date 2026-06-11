@@ -1,0 +1,16 @@
+# Manim outputs
+media/
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS artifacts
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Local configuration
+config.ini

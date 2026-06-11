@@ -1,6 +1,0 @@
-{
-  "python.defaultInterpreterPath": "/Users/bedata/.venv/bin/python",
-  "python.analysis.extraPaths": [
-    "/Users/bedata/.venv/lib/python3.9/site-packages"
-  ]
-}
