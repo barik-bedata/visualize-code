@@ -2,7 +2,7 @@ from manim import *
 
 from components.typography import Typography
 from components.screenTemplate import ScreenTemplate
-from components.highligher import RangeHighlighter
+from components.highlighter import RangeHighlighter
 from components.swapAnimator import SwapAnimator
 
 config.flush_cache = True
@@ -169,6 +169,10 @@ class Statement(Scene):
         self.play(FadeOut(cells1[3][1]), FadeIn(correct_text2), run_time=0.4)
         cells1[3].remove(cells1[3][1])
         cells1[3].add(correct_text2)
+
+        # --- lower third ---
+        tracker.show_lower_third("Complexity Analysis", "Time: O(m + n), Space: O(1)", color_type="green")
+        self.wait(3)
 
         # ── FINAL HIGHLIGHT ──────────────────────────────────────────
         final_highlighter = RangeHighlighter(self, typo.color_green())
