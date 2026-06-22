@@ -31,7 +31,7 @@ class ITypography(ABC):
 
 class Typography(ITypography):
     def __init__(self):
-        self.__BG               = "#052243" # navy-blue: 052243
+        self.__BG               = "#121212"
         self.__WHITE            = "#E0E0E0"
         self.__SECONDARY        = "#B0B0B0"
         self.__RED              = "#DC3545"

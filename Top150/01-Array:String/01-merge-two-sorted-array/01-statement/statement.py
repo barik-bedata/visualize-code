@@ -132,9 +132,9 @@ class Statement(Scene):
         nums1.set_value(2, 2, run_time=0.4)
         nums1.set_value(3, 3, run_time=0.4)
 
-        # --- lower third ---
-        tracker.show_lower_third("Complexity Analysis", "Time: O(m + n), Space: O(1)", color_type="green")
-        self.wait(3)
+        # # --- lower third ---
+        # tracker.show_lower_third("Complexity Analysis", "Time: O(m + n), Space: O(1)", color_type="green")
+        # self.wait(3)
 
         # ── FINAL HIGHLIGHT ──────────────────────────────────────────
         final_highlighter = RangeHighlighter(self, typo.color_green())

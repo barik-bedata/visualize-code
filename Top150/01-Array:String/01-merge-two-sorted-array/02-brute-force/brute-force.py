@@ -168,17 +168,17 @@ class BruteForce(Scene):
         # ─────────────────────────────────────────────────────────────
         panel.activate(1)
 
-        sort_label = Text(
-            "sort(nums1, m+n)",
-            font=typo.font_code(),
-            font_size=16,
-            color=typo.color_blue(),
-        ).next_to(cells1, DOWN, buff=0.5)
+        # sort_label = Text(
+        #     "sort(nums1, m+n)",
+        #     font=typo.font_code(),
+        #     font_size=16,
+        #     color=typo.color_blue(),
+        # ).next_to(cells1, DOWN, buff=0.5)
 
-        self.play(FadeIn(sort_label, shift=UP * 0.15), run_time=0.5)
-        self.wait(0.6)
+        # self.play(FadeIn(sort_label, shift=UP * 0.15), run_time=0.5)
+        # self.wait(0.6)
 
-        self.play(FadeOut(sort_label), run_time=0.3)
+        # self.play(FadeOut(sort_label), run_time=0.3)
         swap_animator.animate_swap(cells1[2], cells1[3])
 
         panel.complete(1)

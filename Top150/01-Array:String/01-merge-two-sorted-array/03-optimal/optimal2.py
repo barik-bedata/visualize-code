@@ -9,7 +9,7 @@ from components.arrayBuilder import ArrayBuilder, IArrayBuilder
 config.flush_cache = True
 
 
-class Optimal(Scene):
+class Optimal2(Scene):
     def construct(self):
         typo: ITypography = Typography()
         self.camera.background_color = typo.bg()
@@ -39,7 +39,7 @@ class Optimal(Scene):
         nums2: IArrayBuilder = ArrayBuilder(
             scene=self,
             typo=typo,
-            values=[2, 5, 6],
+            values=[-5, -2, 6],
             label="nums2",
         ).build()
 
@@ -98,7 +98,7 @@ class Optimal(Scene):
         p_idx = 5
 
         v1 = [1, 2, 3]
-        v2 = [2, 5, 6]
+        v2 = [-5, -2, 6]
 
         while p2_idx >= 0:
             if p1_idx >= 0:
@@ -244,8 +244,8 @@ class Optimal(Scene):
         self.play(FadeOut(p_group), FadeOut(p1_group), FadeOut(p2_group))
 
         # --- lower third ---
-        # tracker.show_lower_third("Complexity Analysis", "Time: O(m + n), Space: O(1)", color_type="green")
-        # self.wait(2)
+        tracker.show_lower_third("Complexity Analysis", "Time: O(m + n), Space: O(1)", color_type="green")
+        self.wait(2)
 
         # ── FINAL HIGHLIGHT ──────────────────────────────────────────
         final_highlighter = RangeHighlighter(self, typo.color_green())

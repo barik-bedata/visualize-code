@@ -43,7 +43,7 @@ class BruteForce1(Scene):
         nums2 = ArrayBuilder(
             scene=self,
             typo=typo,
-            values=[2, 5, 6],
+            values=[-2, -5, 6],
             label="nums2",
         ).build()
 
@@ -108,7 +108,7 @@ class BruteForce1(Scene):
 
         panel.activate(0)
 
-        vals2 = [2, 5, 6]
+        vals2 = [-2, -5, 6]
         for i in range(3):
             source_cell = nums2.cells[i]
             target_cell = nums1.cells[i + 3]
@@ -143,18 +143,38 @@ class BruteForce1(Scene):
         # ─────────────────────────────────────────────────────────────
         panel.activate(1)
 
-        sort_label = Text(
-            "sort(nums1, m+n)",
-            font=typo.font_code(),
-            font_size=16,
-            color=typo.color_blue(),
-        ).next_to(nums1.cells, DOWN, buff=0.5)
+        # sort_label = Text(
+        #     "sort(nums1, m+n)",
+        #     font=typo.font_code(),
+        #     font_size=16,
+        #     color=typo.color_blue(),
+        # ).next_to(nums1.cells, DOWN, buff=0.5)
 
-        self.play(FadeIn(sort_label, shift=UP * 0.15), run_time=0.5)
+        # self.play(FadeIn(sort_label, shift=UP * 0.15), run_time=0.5)
         self.wait(0.6)
 
-        self.play(FadeOut(sort_label), run_time=0.3)
-        swap_animator.animate_swap(nums1.cells[2], nums1.cells[3])
+        # ── Merge Sort Style ────────────────────────────────────────────────
+        # After copy:  [1,  2,  3, -2, -5, 6]   c0 c1 c2 c3 c4 c5
+        #
+        # Phase 1 — Sort RIGHT half [-2,-5,6] → [-5,-2,6]
+        swap_animator.animate_swap(nums1.cells[3], nums1.cells[4])
+        # Visual:      [1,  2,  3, -5, -2, 6]   c0 c1 c2 c4 c3 c5
+        #
+        # Phase 2 — Merge: slide -5 (c4) into its correct position (pos 0)
+        swap_animator.animate_swap(nums1.cells[4], nums1.cells[2])
+        # Visual:      [1,  2, -5,  3, -2, 6]   c0 c1 c4 c2 c3 c5
+        swap_animator.animate_swap(nums1.cells[4], nums1.cells[1])
+        # Visual:      [1, -5,  2,  3, -2, 6]   c0 c4 c1 c2 c3 c5
+        swap_animator.animate_swap(nums1.cells[4], nums1.cells[0])
+        # Visual:      [-5, 1,  2,  3, -2, 6]   c4 c0 c1 c2 c3 c5
+        #
+        # Phase 3 — Merge: slide -2 (c3) into its correct position (pos 1)
+        swap_animator.animate_swap(nums1.cells[3], nums1.cells[2])
+        # Visual:      [-5, 1,  2, -2,  3, 6]   c4 c0 c1 c3 c2 c5
+        swap_animator.animate_swap(nums1.cells[3], nums1.cells[1])
+        # Visual:      [-5, 1, -2,  2,  3, 6]   c4 c0 c3 c1 c2 c5
+        swap_animator.animate_swap(nums1.cells[3], nums1.cells[0])
+        # Visual:      [-5,-2,  1,  2,  3, 6] ✓ c4 c3 c0 c1 c2 c5
 
         panel.complete(1)
 
@@ -173,5 +193,9 @@ class BruteForce1(Scene):
         final_highlighter.effect_pulse()
 
         panel.complete(2)
+
+        # --- lower third ---
+        tracker.show_lower_third("Complexity Analysis", "Time: O((m+n)*log(m+n)), Space: O(m+n)", color_type="green")
+        self.wait(2)
 
         self.wait(1.5)

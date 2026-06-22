@@ -5,18 +5,19 @@ from components.screenTemplate import ScreenTemplate, IScreenTemplate
 from components.highlighter import RangeHighlighter, IRangeHighlighter
 from components.swapAnimator import SwapAnimator
 from components.arrayBuilder import ArrayBuilder, IArrayBuilder
+from components.stepPanel import StepPanel
 
 config.flush_cache = True
 
 
-class Optimal(Scene):
+class Walkthrough(Scene):
     def construct(self):
         typo: ITypography = Typography()
         self.camera.background_color = typo.bg()
         tracker: IScreenTemplate = ScreenTemplate(self, typo)
         swap_animator = SwapAnimator(self)
 
-        tracker.screen_optimal_approach("Optimal Approach")
+        tracker.screen_optimal_approach("Walkthrough")
 
         # ── nums1 ───────────────────────────────────────────────────
         nums1: IArrayBuilder = ArrayBuilder(
@@ -31,9 +32,9 @@ class Optimal(Scene):
         m_text.move_to(m_rect.get_center())
         m_box = VGroup(m_rect, m_text)
 
-        row1 = VGroup(nums1.group, m_box).arrange(RIGHT, buff=0.8)
+        row1 = VGroup(nums1.group, m_box).arrange(RIGHT, buff=0.8).scale(0.7)
         m_box.set_y(nums1.cells.get_y())
-        row1.move_to(UP * 1.2 + LEFT * 1.8)
+        row1.move_to(UP * 1.5 + LEFT * 3.5)
 
         # ── nums2 ───────────────────────────────────────────────────
         nums2: IArrayBuilder = ArrayBuilder(
@@ -48,15 +49,26 @@ class Optimal(Scene):
         n_text.move_to(n_rect.get_center())
         n_box = VGroup(n_rect, n_text)
 
-        row2 = VGroup(nums2.group, n_box).arrange(RIGHT, buff=3.2)
+        row2 = VGroup(nums2.group, n_box).arrange(RIGHT, buff=3.2).scale(0.7)
         n_box.set_y(nums2.cells.get_y())
         row2.next_to(row1, DOWN, buff=1.5, aligned_edge=LEFT)
+
+        # ── Step Panel ─────────────────────────────────────────────
+        steps = [
+            ("Setup Pointers", "Initialize p1, p2, and p"),
+            ("Compare & Place", "Place larger element at p"),
+            ("Drain nums1", "Mark visited elements")
+        ]
+        panel = StepPanel(self, typo, steps)
 
         self.play(
             FadeIn(row1, shift=RIGHT * 0.3),
             FadeIn(row2, shift=RIGHT * 0.3),
             run_time=1.2,
         )
+        self.wait(0.5)
+        
+        panel.show()
         self.wait(0.5)
 
         # First array highlight with glow
@@ -75,23 +87,27 @@ class Optimal(Scene):
         self.wait(0.5)
 
         # ── Three Pointers Setup ─────────────────────────────────────
-        p1_arrow = Arrow(start=UP, end=DOWN, color=typo.color_blue(), max_tip_length_to_length_ratio=0.3, stroke_width=12).scale(0.33)
+        panel.activate(0)
+        
+        p1_arrow = Arrow(start=UP, end=DOWN, color=typo.color_blue(), max_tip_length_to_length_ratio=0.3, stroke_width=10).scale(0.25)
         p1_arrow.next_to(nums1.cells[2], UP, buff=0.1)
-        p1_text = Text("p1", font=typo.font_code(), font_size=20, weight=BOLD, color=typo.color_blue()).next_to(p1_arrow, UP, buff=0.1)
+        p1_text = Text("p1", font=typo.font_code(), font_size=16, weight=BOLD, color=typo.color_blue()).next_to(p1_arrow, UP, buff=0.1)
         p1_group = VGroup(p1_arrow, p1_text)
 
-        p2_arrow = Arrow(start=DOWN, end=UP, color=typo.color_yellow(), max_tip_length_to_length_ratio=0.3, stroke_width=12).scale(0.33)
+        p2_arrow = Arrow(start=DOWN, end=UP, color=typo.color_yellow(), max_tip_length_to_length_ratio=0.3, stroke_width=10).scale(0.25)
         p2_arrow.next_to(nums2.cells[2], DOWN, buff=0.1)
-        p2_text = Text("p2", font=typo.font_code(), font_size=20, weight=BOLD, color=typo.color_yellow()).next_to(p2_arrow, DOWN, buff=0.1)
+        p2_text = Text("p2", font=typo.font_code(), font_size=16, weight=BOLD, color=typo.color_yellow()).next_to(p2_arrow, DOWN, buff=0.1)
         p2_group = VGroup(p2_arrow, p2_text)
 
-        p_arrow = Arrow(start=DOWN, end=UP, color=typo.color_green(), max_tip_length_to_length_ratio=0.3, stroke_width=12).scale(0.33)
+        p_arrow = Arrow(start=DOWN, end=UP, color=typo.color_green(), max_tip_length_to_length_ratio=0.3, stroke_width=10).scale(0.25)
         p_arrow.next_to(nums1.cells[5], DOWN, buff=0.1)
-        p_text = Text("p", font=typo.font_code(), font_size=20, weight=BOLD, color=typo.color_green()).next_to(p_arrow, DOWN, buff=0.1)
+        p_text = Text("p", font=typo.font_code(), font_size=16, weight=BOLD, color=typo.color_green()).next_to(p_arrow, DOWN, buff=0.1)
         p_group = VGroup(p_arrow, p_text)
 
         self.play(FadeIn(p1_group), FadeIn(p2_group), FadeIn(p_group))
         self.wait(1.0)
+        
+        panel.complete(0)
 
         p1_idx = 2
         p2_idx = 2
@@ -100,6 +116,8 @@ class Optimal(Scene):
         v1 = [1, 2, 3]
         v2 = [2, 5, 6]
 
+        panel.activate(1)
+        
         while p2_idx >= 0:
             if p1_idx >= 0:
                 nums1.cells[p1_idx].set_z_index(1)
@@ -204,7 +222,12 @@ class Optimal(Scene):
                     anims.append(Transform(p2_group[1], out_of_bound_text))
                 self.play(*anims, run_time=0.5)
 
+        panel.complete(1)
+        
         # p1 draining loop to mark visited elements and place them in final position (p)
+        if p1_idx >= 0:
+            panel.activate(2)
+            
         while p1_idx >= 0:
             nums1.cells[p1_idx].set_z_index(1)
             self.play(nums1.cells[p1_idx][0].animate.set_stroke(typo.color_blue()), run_time=0.3)
@@ -240,12 +263,20 @@ class Optimal(Scene):
                 
             self.play(*anims, run_time=0.5)
 
+        if p1_idx < 0:
+            try:
+                panel.complete(2)
+            except Exception:
+                pass
+
+        panel.hide()
+
         self.wait(1.0)
         self.play(FadeOut(p_group), FadeOut(p1_group), FadeOut(p2_group))
 
         # --- lower third ---
-        # tracker.show_lower_third("Complexity Analysis", "Time: O(m + n), Space: O(1)", color_type="green")
-        # self.wait(2)
+        tracker.show_lower_third("Complexity Analysis", "Time: O(m + n), Space: O(1)", color_type="green")
+        self.wait(2)
 
         # ── FINAL HIGHLIGHT ──────────────────────────────────────────
         final_highlighter = RangeHighlighter(self, typo.color_green())
