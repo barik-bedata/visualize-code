@@ -1,4 +1,8 @@
 from manim import *
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent / "00-shared-components"))
+
 
 from components.typography import Typography, ITypography
 from components.screenTemplate import ScreenTemplate, IScreenTemplate

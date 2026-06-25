@@ -1,11 +1,216 @@
-"""
-Brute Force Solution for: Two Sum
-Time Complexity: O(N^2)
-Space Complexity: O(1)
-"""
+from manim import *
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent / "00-shared-components"))
 
-def solve():
-    pass
+import numpy as np
 
-if __name__ == "__main__":
-    solve()
+config.flush_cache = True
+
+class BruteForce(Scene):
+    def construct(self):
+        # ১. প্রিমিয়াম ম্যাট অফ-ব্ল্যাক ব্যাকগ্রাউন্ড
+        self.camera.background_color = "#1e1e1e" 
+        
+        # কালার থিম কনস্ট্যান্টস (Pattern Problem Template)
+        WHITE = "#E0E0E0"
+        GRAY = "#424242"
+        YELLOW = "#EAB308"
+        RED = "#DC3545"
+        GREEN = "#198754"
+        BLUE = "#1A73E8"
+        BLACK = "#000000"
+        
+        # কালার থিম কনস্ট্যান্টস
+        BG_I_BLUE = "#1A73E8"       # i পয়েন্টারের জন্য ব্লু
+        BG_J_ORANGERED = "#DC3545"  # j পয়েন্টারের জন্য অরেঞ্জ-রেড
+        BORDER_YELLOW = YELLOW
+        HIGHLIGHT_BLUE = BLUE       # কমপ্লেক্সিটি বক্সের জন্য পিওর ব্লু
+        
+        # ==========================================
+        # ২. LAYOUT SETUP (Fixed: Clean Title without Complexity)
+        # ==========================================
+        
+        # [FIXED] টাইটেল থেকে O(N^2) সরিয়ে সম্পূর্ণ ফ্রেশ করা হলো
+        title = Text("Two Sum - Brute Force", font="Sans", font_size=28, color=WHITE)
+        title.to_edge(UP + LEFT, buff=0.5)
+        self.add(title)
+
+        nums_label = Text("nums = ", font="Sans", font_size=24, color=WHITE)
+        
+        nums = [2, 1, 3, 5, 8]
+        array_cells = VGroup(*[
+            VGroup(
+                Square(side_length=1.0, color=WHITE, stroke_width=4, fill_opacity=0),
+                Text(str(val), font="Sans", font_size=26, color=WHITE)
+            ) for val in nums
+        ]).arrange(buff=0)
+        
+        array_with_label = VGroup(nums_label, array_cells).arrange(RIGHT, buff=0.25)
+        array_with_label.move_to(LEFT * 2.0 + UP * 0.6)
+        
+        indices = VGroup(*[
+            Text(str(idx), font="Monospace", font_size=16, color=GRAY)
+            .next_to(array_cells[idx][0], UP, buff=0.15)
+            for idx in range(len(nums))
+        ])
+        
+        left_content = VGroup(array_with_label, indices)
+
+        target_box = RoundedRectangle(corner_radius=0.15, width=2.4, height=0.9, color=WHITE, stroke_width=2.5, fill_opacity=0)
+        target_txt = Text("Target = 9", font="Sans", font_size=22, color=WHITE)
+        right_target_group = VGroup(target_box, target_txt).move_to(RIGHT * 4.2 + UP * 0.6)
+
+        self.play(
+            FadeIn(left_content, shift=RIGHT * 0.3),
+            FadeIn(right_target_group, shift=LEFT * 0.3),
+            run_time=1.2
+        )
+        self.wait(0.4)
+
+        # ==========================================
+        # ৩. POINTER GENERATION (Shortened 4x Thick Arrows)
+        # ==========================================
+        
+        i_arrow = Arrow(DOWN * 0.35, ORIGIN, color=BG_I_BLUE, stroke_width=24, max_tip_length_to_length_ratio=0.45, buff=0)
+        i_label = Text("i", font="Sans", font_size=30, weight=BOLD, color=BG_I_BLUE).next_to(i_arrow, DOWN, buff=0.1)
+        i_ptr = VGroup(i_arrow, i_label).next_to(array_cells[0][0], DOWN, buff=0.2) 
+
+        j_arrow = Arrow(UP * 0.35, ORIGIN, color=BG_J_ORANGERED, stroke_width=24, max_tip_length_to_length_ratio=0.45, buff=0)
+        j_label = Text("j", font="Sans", font_size=30, weight=BOLD, color=BG_J_ORANGERED).next_to(j_arrow, UP, buff=0.1)
+        j_ptr = VGroup(j_label, j_arrow).next_to(indices[1], UP, buff=0.2) 
+
+        self.play(FadeIn(i_ptr), FadeIn(j_ptr), run_time=0.6)
+        self.wait(0.3)
+
+        # ==========================================
+        # ৪. BRUTE FORCE SIMULATION CORE LOGIC
+        # ==========================================
+        
+        calc_y_pos = -2.2 
+        
+        def check_pair(i, j, is_match=False):
+            self.bring_to_front(array_cells[i], array_cells[j])
+            
+            self.play(
+                i_ptr.animate.next_to(array_cells[i][0], DOWN, buff=0.2),
+                j_ptr.animate.next_to(indices[j], UP, buff=0.2),
+                array_cells[i][0].animate.set_fill(BG_I_BLUE, opacity=1),
+                array_cells[j][0].animate.set_fill(BG_J_ORANGERED, opacity=1),
+                run_time=0.8
+            )
+            
+            val_i_copy = array_cells[i][1].copy()
+            val_j_copy = array_cells[j][1].copy()
+            
+            plus_sign = Text("+", font="Sans", font_size=24, color=WHITE).move_to(np.array([-0.8, calc_y_pos, 0]))
+            eq_sign = Text("=", font="Sans", font_size=24, color=WHITE).move_to(np.array([0.6, calc_y_pos, 0]))
+            
+            current_sum = nums[i] + nums[j]
+            sum_txt = Text(str(current_sum), font="Sans", font_size=24, color=WHITE).move_to(np.array([1.4, calc_y_pos, 0]))
+            
+            self.play(
+                val_i_copy.animate.next_to(plus_sign, LEFT, buff=0.3),
+                val_j_copy.animate.next_to(plus_sign, RIGHT, buff=0.3),
+                FadeIn(plus_sign),
+                FadeIn(eq_sign),
+                FadeIn(sum_txt),
+                run_time=0.8
+            )
+            
+            if not is_match:
+                not_equal_sign = Text("≠ 9", font="Sans", font_size=24, color=RED).next_to(sum_txt, RIGHT, buff=0.4)
+                self.play(Write(not_equal_sign), run_time=0.4)
+                self.wait(0.4)
+                
+                self.play(
+                    FadeOut(val_i_copy), FadeOut(val_j_copy), 
+                    FadeOut(plus_sign), FadeOut(eq_sign), 
+                    FadeOut(sum_txt), FadeOut(not_equal_sign),
+                    array_cells[j][0].animate.set_fill(BLACK, opacity=0), 
+                    run_time=0.5
+                )
+            else:
+                equal_target = Text("== 9", font="Sans", font_size=24, color=GREEN).next_to(sum_txt, RIGHT, buff=0.4)
+                self.play(
+                    array_cells[i][0].animate.set_stroke(color=BORDER_YELLOW, width=8),
+                    array_cells[j][0].animate.set_stroke(color=BORDER_YELLOW, width=8),
+                    Write(equal_target),
+                    run_time=0.6
+                )
+                self.wait(0.4)
+                
+                equation_group = VGroup(val_i_copy, plus_sign, val_j_copy, eq_sign, sum_txt, equal_target)
+                
+                final_box = RoundedRectangle(corner_radius=0.15, width=2.4, height=0.8, color=BORDER_YELLOW, stroke_width=4, fill_opacity=0)
+                final_box.move_to(np.array([0, calc_y_pos, 0]))
+                
+                final_txt = Text("[1, 4]", font="Sans", font_size=26, color=WHITE).move_to(final_box.get_center())
+                
+                idx1_flying_copy = indices[1].copy()
+                idx4_flying_copy = indices[4].copy()
+                self.bring_to_front(idx1_flying_copy, idx4_flying_copy)
+                
+                self.play(
+                    ReplacementTransform(equation_group, final_box),
+                    FadeOut(i_ptr), FadeOut(j_ptr),
+                    FadeIn(final_txt[0]), 
+                    FadeIn(final_txt[2]), 
+                    FadeIn(final_txt[4]), 
+                    ReplacementTransform(idx1_flying_copy, final_txt[1]), 
+                    ReplacementTransform(idx4_flying_copy, final_txt[3]),
+                    run_time=1.6,
+                    rate_func=smooth
+                )
+                
+                self.play(
+                    Flash(final_box, color=BORDER_YELLOW, flash_radius=1.0, num_lines=16, line_stroke_width=4),
+                    run_time=0.5
+                )
+                self.wait(0.4)
+
+                # ==========================================
+                # ৫. [NEW] COMPLEXITY PANEL (Top Right Premium Blue Box)
+                # ==========================================
+                
+                # সুন্দর ব্লু বর্ডারের রাউন্ডেড বক্স
+                comp_box = RoundedRectangle(corner_radius=0.15, width=2.6, height=1.2, color=HIGHLIGHT_BLUE, stroke_width=3, fill_opacity=0)
+                
+                # ভেতরে সুন্দর স্পেসিং দিয়ে টেক্সট সাজানো
+                tc_label = Text("TC: O(N²)", font="Sans", font_size=18, color=WHITE)
+                sc_label = Text("SC: O(1)", font="Sans", font_size=18, color=WHITE)
+                comp_texts = VGroup(tc_label, sc_label).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
+                comp_texts.move_to(comp_box.get_center())
+                
+                # সম্পূর্ণ প্যানেলটিকে টপ-রাইট কর্নারে পজিশন করা হলো
+                complexity_panel = VGroup(comp_box, comp_texts).to_edge(UP + RIGHT, buff=0.5)
+                
+                # গর্জিয়াস ক্রিয়েশন অ্যানিমেশন সহ বক্সে এন্ট্রি
+                self.play(
+                    Create(comp_box, run_time=1.0),
+                    Write(comp_texts, run_time=0.8),
+                    rate_func=smooth
+                )
+                
+                # [CELEBRATION FLASH] পুরো বক্স জুড়ে চমৎকার একটি নিয়ন ব্লু ফ্ল্যাশ ইফেক্ট
+                self.play(
+                    Flash(comp_box, color=HIGHLIGHT_BLUE, flash_radius=1.5, num_lines=24, line_stroke_width=4),
+                    run_time=0.6
+                )
+
+        # ==========================================
+        # ৬. SIMULATION EXECUTION STEPS
+        # ==========================================
+        check_pair(0, 1) 
+        check_pair(0, 2) 
+        check_pair(0, 3) 
+        check_pair(0, 4) 
+        
+        self.play(array_cells[0][0].animate.set_fill(BLACK, opacity=0), run_time=0.3)
+        
+        check_pair(1, 2) 
+        check_pair(1, 3) 
+        
+        # সলিউশন হিট এবং ফাইনাল সেলিব্রেশন!
+        check_pair(1, 4, is_match=True)
+        self.wait(3)
