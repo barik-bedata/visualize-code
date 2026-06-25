@@ -50,7 +50,7 @@ class Walkthrough(Scene):
         ]).arrange(buff=0)
         
         array_with_label = VGroup(nums_label, array_cells).arrange(RIGHT, buff=0.2)
-        array_with_label.move_to(LEFT * 3.5 + UP * 1.5) 
+        array_with_label.move_to(LEFT * 3.5 + UP * 2.2) 
         
         indices = VGroup(*[
             Text(str(idx), font=typo.font_code(), font_size=12, color=GRAY)
@@ -62,13 +62,13 @@ class Walkthrough(Scene):
 
         target_box = RoundedRectangle(corner_radius=0.1, width=1.6, height=0.6, color=WHITE, stroke_width=2, fill_opacity=0)
         target_txt = Text("Target = 9", font=typo.font_ui(), font_size=16, color=WHITE)
-        right_target_group = VGroup(target_box, target_txt).move_to(LEFT * 3.5 + UP * 0.4)
+        right_target_group = VGroup(target_box, target_txt).move_to(LEFT * 3.5 + UP * 0.5)
 
         # ── HASH MAP TABLE ──
         map_title = Text("Hash Map", font=typo.font_ui(), font_size=20, weight=BOLD, color=WHITE)
         map_title.move_to(LEFT * 3.5 + DOWN * 0.5)
         
-        map_box = RoundedRectangle(corner_radius=0.15, width=2.8, height=2.8, color=GRAY, stroke_width=2.5, fill_opacity=0)
+        map_box = RoundedRectangle(corner_radius=0.15, width=2.8, height=2.6, color=GRAY, stroke_width=2.5, fill_opacity=0)
         map_box.next_to(map_title, DOWN, buff=0.2)
         
         divider_v = Line(
@@ -96,13 +96,17 @@ class Walkthrough(Scene):
         # ==========================================
         java_code_string = """public int[] twoSum(int[] nums, int target) {
     Map<Integer, Integer> map = new HashMap<>();
+    
     for (int i = 0; i < nums.length; i++) {
         int complement = target - nums[i];
+        
         if (map.containsKey(complement)) {
             return new int[] { map.get(complement), i };
         }
+        
         map.put(nums[i], i);
     }
+    
     return new int[] {};
 }"""
         code_block = Code(
@@ -111,7 +115,7 @@ class Walkthrough(Scene):
             tab_width=4,
             background="window",
             formatter_style="monokai"
-        ).scale(0.6)
+        ).scale(0.55)
         code_block.to_edge(RIGHT, buff=0.2).shift(DOWN * 0.2)
 
         self.play(
@@ -124,14 +128,20 @@ class Walkthrough(Scene):
         self.wait(0.5)
 
         # Highlighter logic
-        h_rect = SurroundingRectangle(code_block[2][0], color=YELLOW, corner_radius=0.05, buff=0.05)
+        line_width = code_block.width + 0.1
+        box_height = 0.25
+        
+        h_rect = RoundedRectangle(width=line_width, height=box_height, color=YELLOW, corner_radius=0.05)
         h_rect.set_stroke(width=2)
+        h_rect.set_y(code_block[1][0].get_y())
+        h_rect.set_x(code_block.get_x())
         
         def highlight_line(line_num: int, run_time=0.4):
-            # line_num is 0-indexed relative to the code string lines
-            line = code_block[2][line_num]
-            new_rect = SurroundingRectangle(line, color=YELLOW, corner_radius=0.05, buff=0.05)
+            target_y = code_block[1][line_num].get_y()
+            new_rect = RoundedRectangle(width=line_width, height=box_height, color=YELLOW, corner_radius=0.05)
             new_rect.set_stroke(width=2)
+            new_rect.set_y(target_y)
+            new_rect.set_x(code_block.get_x())
             self.play(Transform(h_rect, new_rect), run_time=run_time)
 
         self.play(FadeIn(h_rect))
@@ -146,8 +156,8 @@ class Walkthrough(Scene):
         self.wait(0.5)
         
         # Prepare pointer 'i'
-        i_arrow = Arrow(DOWN * 0.25, ORIGIN, color=SCAN_BLUE, stroke_width=15, max_tip_length_to_length_ratio=0.45, buff=0)
-        i_label = Text("i", font=typo.font_ui(), font_size=20, weight=BOLD, color=SCAN_BLUE).next_to(i_arrow, DOWN, buff=0.1)
+        i_arrow = Arrow(start=DOWN, end=UP, color=SCAN_BLUE, stroke_width=10, max_tip_length_to_length_ratio=0.3).scale(0.25)
+        i_label = Text("i", font=typo.font_ui(), font_size=18, weight=BOLD, color=SCAN_BLUE).next_to(i_arrow, DOWN, buff=0.1)
         i_ptr = VGroup(i_arrow, i_label)
 
         inserted_rows_items = [] 
@@ -182,22 +192,24 @@ class Walkthrough(Scene):
             )
 
         for i in range(len(nums)):
-            # Line 2: for (int i = 0; i < nums.length; i++)
-            highlight_line(2)
+            # Line 3: for (int i = 0; i < nums.length; i++)
+            highlight_line(3)
             
             self.bring_to_front(array_cells[i])
             if i == 0:
-                i_ptr.next_to(array_cells[i][0], DOWN, buff=0.1)
+                i_arrow.next_to(array_cells[i][0], DOWN, buff=0.1)
+                i_label.next_to(i_arrow, DOWN, buff=0.1)
                 self.play(FadeIn(i_ptr), array_cells[i][0].animate.set_fill(SCAN_BLUE, opacity=1), run_time=0.5)
             else:
                 self.play(
-                    i_ptr.animate.next_to(array_cells[i][0], DOWN, buff=0.1),
+                    i_arrow.animate.next_to(array_cells[i][0], DOWN, buff=0.1),
+                    i_label.animate.next_to(i_arrow, DOWN, buff=0.1),
                     array_cells[i][0].animate.set_fill(SCAN_BLUE, opacity=1),
                     run_time=0.5
                 )
             
-            # Line 3: int complement = target - nums[i];
-            highlight_line(3)
+            # Line 4: int complement = target - nums[i];
+            highlight_line(4)
             
             comp = 9 - nums[i]
             
@@ -207,7 +219,7 @@ class Walkthrough(Scene):
             val_curr = Text(str(nums[i]), font=typo.font_ui(), font_size=16, color=WHITE)
             
             expr_group = VGroup(comp_lbl, val_target, minus_sign, val_curr).arrange(RIGHT, buff=0.1)
-            expr_group.move_to(LEFT * 1.5 + DOWN * 2.0)
+            expr_group.move_to(LEFT * 1.5 + DOWN * 0.2)
             
             self.play(Write(comp_lbl), run_time=0.3)
             fly_9 = Text("9", font=typo.font_ui(), font_size=16, color=WHITE).move_to(target_txt.get_right() + LEFT * 0.1)
@@ -222,8 +234,8 @@ class Walkthrough(Scene):
             self.play(ReplacementTransform(VGroup(fly_9, minus_sign, fly_curr), result_val), run_time=0.4)
             calc_txt = VGroup(comp_lbl, result_val)
             
-            # Line 4: if (map.containsKey(complement))
-            highlight_line(4)
+            # Line 6: if (map.containsKey(complement))
+            highlight_line(6)
             
             search_status_txt = Text(f"Checking Map: {comp} ?", font=typo.font_ui(), font_size=16, color=YELLOW)
             search_status_txt.next_to(map_box, DOWN, buff=0.2)
@@ -262,13 +274,13 @@ class Walkthrough(Scene):
                     run_time=0.5
                 )
                 
-                # Line 5: return new int[] { map.get(complement), i };
-                highlight_line(5)
+                # Line 7: return new int[] { map.get(complement), i };
+                highlight_line(7)
                 
                 self.play(FadeOut(calc_txt), FadeOut(final_status_txt), run_time=0.2)
                 
                 final_box = RoundedRectangle(corner_radius=0.1, width=1.6, height=0.6, color=SUCCESS_BOOTSTRAP_GREEN, stroke_width=3, fill_opacity=0)
-                final_box.move_to(LEFT * 1.5 + DOWN * 2.0)
+                final_box.move_to(LEFT * 1.5 + DOWN * 0.2)
                 
                 open_b = Text("[", font=typo.font_ui(), font_size=20, color=WHITE)
                 idx1_str = matched_row_content[1].text
@@ -301,8 +313,8 @@ class Walkthrough(Scene):
                 final_status_txt.move_to(search_status_txt.get_center())
                 self.play(ReplacementTransform(search_status_txt, final_status_txt), run_time=0.3)
                 
-                # Line 7: map.put(nums[i], i);
-                highlight_line(7)
+                # Line 10: map.put(nums[i], i);
+                highlight_line(10)
                 
                 self.play(FadeOut(calc_txt), FadeOut(final_status_txt), run_time=0.2)
                 
