@@ -10,16 +10,23 @@ config.flush_cache = True
 class BruteForce(Scene):
     def construct(self):
         # ১. প্রিমিয়াম ম্যাট অফ-ব্ল্যাক ব্যাকগ্রাউন্ড
-        self.camera.background_color = "#1e1e1e" 
+        from components.typography import Typography
+        from components.screenTemplate import ScreenTemplate
+        
+        typo = Typography()
+        screen_template = ScreenTemplate(self, typo)
+        
+        self.camera.background_color = typo.bg()
         
         # কালার থিম কনস্ট্যান্টস (Pattern Problem Template)
-        WHITE = "#E0E0E0"
-        GRAY = "#424242"
-        YELLOW = "#EAB308"
-        RED = "#DC3545"
-        GREEN = "#198754"
-        BLUE = "#1A73E8"
-        BLACK = "#000000"
+        WHITE = typo.color_white()
+        GRAY = typo.color_gray()
+        YELLOW = typo.color_yellow()
+        RED = typo.color_red()
+        GREEN = typo.color_green()
+        BLUE = typo.color_blue()
+        BLACK = typo.text_on_yellow()
+
         
         # কালার থিম কনস্ট্যান্টস
         BG_I_BLUE = "#1A73E8"       # i পয়েন্টারের জন্য ব্লু
@@ -31,10 +38,9 @@ class BruteForce(Scene):
         # ২. LAYOUT SETUP (Fixed: Clean Title without Complexity)
         # ==========================================
         
-        # [FIXED] টাইটেল থেকে O(N^2) সরিয়ে সম্পূর্ণ ফ্রেশ করা হলো
-        title = Text("Two Sum - Brute Force", font="Sans", font_size=28, color=WHITE)
-        title.to_edge(UP + LEFT, buff=0.5)
-        self.add(title)
+        # স্ক্রিন ইন্ডিকেটর ব্যবহার করা হলো
+        screen_template.screen_brute_force("Two Sum - Brute Force")
+
 
         nums_label = Text("nums = ", font="Sans", font_size=24, color=WHITE)
         

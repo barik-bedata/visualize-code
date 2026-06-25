@@ -10,17 +10,23 @@ config.flush_cache = True
 class HashMapSolution(Scene):
     def construct(self):
         # ১. প্রিমিয়াম ম্যাট অফ-ব্ল্যাক ব্যাকগ্রাউন্ড
-        self.camera.background_color = "#1e1e1e" 
+        from components.typography import Typography
+        from components.screenTemplate import ScreenTemplate
+        
+        typo = Typography()
+        screen_template = ScreenTemplate(self, typo)
+        
+        self.camera.background_color = typo.bg()
         
         # কালার থিম কনস্ট্যান্টস (Pattern Problem Template)
-        WHITE = "#E0E0E0"
-        GRAY = "#424242"
-        GRAY_A = "#B0B0B0"
-        YELLOW = "#EAB308"
-        RED = "#DC3545"
-        GREEN = "#198754"
-        BLUE = "#1A73E8"
-        BLACK = "#000000"
+        WHITE = typo.color_white()
+        GRAY = typo.color_gray()
+        GRAY_A = typo.color_secondary()
+        YELLOW = typo.color_yellow()
+        RED = typo.color_red()
+        GREEN = typo.color_green()
+        BLUE = typo.color_blue()
+        BLACK = typo.text_on_yellow()
         
         # কালার থিম কনস্ট্যান্টস
         SCAN_BLUE = "#1A73E8"       
@@ -33,9 +39,8 @@ class HashMapSolution(Scene):
         # ২. LAYOUT SETUP
         # ==========================================
         
-        title = Text("Two Sum - Optimized", font="Sans", font_size=28, color=WHITE)
-        title.to_edge(UP + LEFT, buff=0.5)
-        self.add(title)
+        screen_template.screen_optimal_approach("Two Sum - Optimized")
+
 
         nums_label = Text("nums = ", font="Sans", font_size=24, color=WHITE)
         
@@ -92,7 +97,6 @@ class HashMapSolution(Scene):
         table_grid = VGroup(map_title, map_box, divider_v, header_line, key_header, val_header)
 
         self.play(
-            title.animate.set_color(WHITE),
             FadeIn(left_content, shift=RIGHT * 0.3),
             FadeIn(right_target_group, shift=LEFT * 0.3),
             FadeIn(table_grid, shift=UP * 0.2),
