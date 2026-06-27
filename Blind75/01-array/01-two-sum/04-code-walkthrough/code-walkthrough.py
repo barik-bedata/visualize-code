@@ -34,7 +34,7 @@ class Walkthrough(Scene):
         # ==========================================
         # 1. SCREEN TITLE
         # ==========================================
-        tracker.screen_code_walkthrough("Code Walkthrough")
+        # tracker.screen_code_walkthrough("Code Walkthrough")
 
         # ==========================================
         # 2. LAYOUT SETUP (Left Side)
@@ -50,7 +50,6 @@ class Walkthrough(Scene):
         ]).arrange(buff=0)
         
         array_with_label = VGroup(nums_label, array_cells).arrange(RIGHT, buff=0.2)
-        array_with_label.move_to(LEFT * 3.5 + UP * 2.2) 
         
         indices = VGroup(*[
             Text(str(idx), font=typo.font_code(), font_size=12, color=GRAY)
@@ -62,11 +61,10 @@ class Walkthrough(Scene):
 
         target_box = RoundedRectangle(corner_radius=0.1, width=1.6, height=0.6, color=WHITE, stroke_width=2, fill_opacity=0)
         target_txt = Text("Target = 9", font=typo.font_ui(), font_size=16, color=WHITE)
-        right_target_group = VGroup(target_box, target_txt).move_to(LEFT * 3.5 + UP * 0.5)
+        right_target_group = VGroup(target_box, target_txt)
 
         # ── HASH MAP TABLE ──
         map_title = Text("Hash Map", font=typo.font_ui(), font_size=20, weight=BOLD, color=WHITE)
-        map_title.move_to(LEFT * 3.5 + DOWN * 0.5)
         
         map_box = RoundedRectangle(corner_radius=0.15, width=2.8, height=2.6, color=GRAY, stroke_width=2.5, fill_opacity=0)
         map_box.next_to(map_title, DOWN, buff=0.2)
@@ -116,7 +114,17 @@ class Walkthrough(Scene):
             background="window",
             formatter_style="monokai"
         ).scale(0.55)
-        code_block.to_edge(RIGHT, buff=0.2).shift(DOWN * 0.2)
+        # Position left column elements vertically with sufficient clearance for pointer 'i'
+        right_target_group.next_to(left_content, DOWN, buff=1.6)
+        table_grid.next_to(right_target_group, DOWN, buff=0.3)
+        left_column = VGroup(left_content, right_target_group, table_grid)
+        
+        # Position and center all content dynamically
+        all_content = VGroup(left_column, code_block).arrange(RIGHT, buff=1.2)
+        all_content.move_to(ORIGIN)
+        
+        # Calculate dynamic mid_x for calculation displays in the middle gap
+        mid_x = (map_box.get_right()[0] + code_block.get_left()[0]) / 2
 
         self.play(
             FadeIn(left_content, shift=RIGHT * 0.3),
@@ -197,13 +205,11 @@ class Walkthrough(Scene):
             
             self.bring_to_front(array_cells[i])
             if i == 0:
-                i_arrow.next_to(array_cells[i][0], DOWN, buff=0.1)
-                i_label.next_to(i_arrow, DOWN, buff=0.1)
+                i_ptr.next_to(array_cells[i][0], DOWN, buff=0.1)
                 self.play(FadeIn(i_ptr), array_cells[i][0].animate.set_fill(SCAN_BLUE, opacity=1), run_time=0.5)
             else:
                 self.play(
-                    i_arrow.animate.next_to(array_cells[i][0], DOWN, buff=0.1),
-                    i_label.animate.next_to(i_arrow, DOWN, buff=0.1),
+                    i_ptr.animate.next_to(array_cells[i][0], DOWN, buff=0.1),
                     array_cells[i][0].animate.set_fill(SCAN_BLUE, opacity=1),
                     run_time=0.5
                 )
@@ -219,7 +225,7 @@ class Walkthrough(Scene):
             val_curr = Text(str(nums[i]), font=typo.font_ui(), font_size=16, color=WHITE)
             
             expr_group = VGroup(comp_lbl, val_target, minus_sign, val_curr).arrange(RIGHT, buff=0.1)
-            expr_group.move_to(LEFT * 1.5 + DOWN * 0.2)
+            expr_group.move_to([mid_x, -0.2, 0])
             
             self.play(Write(comp_lbl), run_time=0.3)
             fly_9 = Text("9", font=typo.font_ui(), font_size=16, color=WHITE).move_to(target_txt.get_right() + LEFT * 0.1)
@@ -231,7 +237,11 @@ class Walkthrough(Scene):
             result_val = Text(str(comp), font=typo.font_ui(), font_size=16, color=WHITE)
             result_val.next_to(comp_lbl, RIGHT, buff=0.1)
             
-            self.play(ReplacementTransform(VGroup(fly_9, minus_sign, fly_curr), result_val), run_time=0.4)
+            self.play(
+                FadeOut(VGroup(fly_9, minus_sign, fly_curr)),
+                FadeIn(result_val),
+                run_time=0.4
+            )
             calc_txt = VGroup(comp_lbl, result_val)
             
             # Line 6: if (map.containsKey(complement))
@@ -280,7 +290,7 @@ class Walkthrough(Scene):
                 self.play(FadeOut(calc_txt), FadeOut(final_status_txt), run_time=0.2)
                 
                 final_box = RoundedRectangle(corner_radius=0.1, width=1.6, height=0.6, color=SUCCESS_BOOTSTRAP_GREEN, stroke_width=3, fill_opacity=0)
-                final_box.move_to(LEFT * 1.5 + DOWN * 0.2)
+                final_box.move_to([mid_x, -0.2, 0])
                 
                 open_b = Text("[", font=typo.font_ui(), font_size=20, color=WHITE)
                 idx1_str = matched_row_content[1].text

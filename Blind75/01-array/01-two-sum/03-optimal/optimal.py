@@ -33,13 +33,12 @@ class HashMapSolution(Scene):
         SUCCESS_BOOTSTRAP_GREEN = "#198754" 
         BORDER_ORANGERED = "#DC3545" 
         MAP_SCAN_YELLOW = YELLOW    
-        COMPLEXITY_BLUE = BLUE      
         
         # ==========================================
         # ২. LAYOUT SETUP
         # ==========================================
         
-        screen_template.screen_optimal_approach("Two Sum - Optimized")
+        screen_template.screen_optimal_approach("Optimal Approach")
 
 
         nums_label = Text("nums = ", font="Sans", font_size=24, color=WHITE)
@@ -294,25 +293,9 @@ class HashMapSolution(Scene):
                 self.wait(0.3)
                 
                 # ==========================================
-                # ৬. COMPLEXITY PANEL 
+                # ৬. COMPLEXITY PANEL (Lower Third from ScreenTemplate)
                 # ==========================================
-                comp_box = RoundedRectangle(corner_radius=0.15, width=2.6, height=1.2, color=COMPLEXITY_BLUE, stroke_width=3, fill_opacity=0)
-                tc_label = Text("TC: O(N)", font="Sans", font_size=18, color=WHITE)
-                sc_label = Text("SC: O(N)", font="Sans", font_size=18, color=WHITE)
-                comp_texts = VGroup(tc_label, sc_label).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
-                comp_texts.move_to(comp_box.get_center())
-                
-                complexity_panel = VGroup(comp_box, comp_texts).to_corner(DOWN + LEFT, buff=0.5).shift(UP * 0.8)
-                
-                self.play(
-                    Create(comp_box, run_time=0.8),
-                    Write(comp_texts, run_time=0.6),
-                    rate_func=smooth
-                )
-                self.play(
-                    Flash(comp_box, color=COMPLEXITY_BLUE, flash_radius=1.5, num_lines=24, line_stroke_width=4),
-                    run_time=0.5
-                )
+                screen_template.show_lower_third("Complexity Analysis", "Time: O(N), Space: O(N)", color_type="green")
 
         # ==========================================
         # 7. EXECUTION STEPS

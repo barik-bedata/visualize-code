@@ -39,7 +39,7 @@ class BruteForce(Scene):
         # ==========================================
         
         # স্ক্রিন ইন্ডিকেটর ব্যবহার করা হলো
-        screen_template.screen_brute_force("Two Sum - Brute Force")
+        screen_template.screen_brute_force("Brute Force")
 
 
         nums_label = Text("nums = ", font="Sans", font_size=24, color=WHITE)
@@ -176,33 +176,9 @@ class BruteForce(Scene):
                 self.wait(0.4)
 
                 # ==========================================
-                # ৫. [NEW] COMPLEXITY PANEL (Top Right Premium Blue Box)
+                # ৫. COMPLEXITY PANEL (Lower Third from ScreenTemplate)
                 # ==========================================
-                
-                # সুন্দর ব্লু বর্ডারের রাউন্ডেড বক্স
-                comp_box = RoundedRectangle(corner_radius=0.15, width=2.6, height=1.2, color=HIGHLIGHT_BLUE, stroke_width=3, fill_opacity=0)
-                
-                # ভেতরে সুন্দর স্পেসিং দিয়ে টেক্সট সাজানো
-                tc_label = Text("TC: O(N²)", font="Sans", font_size=18, color=WHITE)
-                sc_label = Text("SC: O(1)", font="Sans", font_size=18, color=WHITE)
-                comp_texts = VGroup(tc_label, sc_label).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
-                comp_texts.move_to(comp_box.get_center())
-                
-                # সম্পূর্ণ প্যানেলটিকে টপ-রাইট কর্নারে পজিশন করা হলো
-                complexity_panel = VGroup(comp_box, comp_texts).to_edge(UP + RIGHT, buff=0.5)
-                
-                # গর্জিয়াস ক্রিয়েশন অ্যানিমেশন সহ বক্সে এন্ট্রি
-                self.play(
-                    Create(comp_box, run_time=1.0),
-                    Write(comp_texts, run_time=0.8),
-                    rate_func=smooth
-                )
-                
-                # [CELEBRATION FLASH] পুরো বক্স জুড়ে চমৎকার একটি নিয়ন ব্লু ফ্ল্যাশ ইফেক্ট
-                self.play(
-                    Flash(comp_box, color=HIGHLIGHT_BLUE, flash_radius=1.5, num_lines=24, line_stroke_width=4),
-                    run_time=0.6
-                )
+                screen_template.show_lower_third("Complexity Analysis", "Time: O(N²), Space: O(1)", color_type="red")
 
         # ==========================================
         # ৬. SIMULATION EXECUTION STEPS
