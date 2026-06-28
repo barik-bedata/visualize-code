@@ -4,6 +4,18 @@ media/
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Environment and logs
+.env
+*.log
+*.tmp
+*.swp
 
 # OS artifacts
 .DS_Store
