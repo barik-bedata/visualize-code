@@ -105,18 +105,20 @@ class BruteForce(Scene):
         
         current_max = 0
         
-        # We'll only simulate the first few iterations fully, then fast forward
-        iterations_to_show = [(0,1), (0,2), (0,3), (1,2), (1,3), (1,4), (1,5)]
+        # All possible pairs (i, j) where i < j
+        all_pairs = [(i, j) for i in range(len(prices_array)) for j in range(i + 1, len(prices_array))]
         
         profit_calc = Text("", font=typo.font_code(), font_size=20, color=WHITE).next_to(algo_text, DOWN, buff=0.5)
         
-        for i, j in iterations_to_show:
-            if i == 0 and j == 1:
+        for idx_pair, (i, j) in enumerate(all_pairs):
+            if idx_pair == 0:
                 i_ptr.next_to(cells[i][0], DOWN, buff=0.3)
-                self.play(FadeIn(i_ptr), cells[i][0].animate.set_fill(BLUE, opacity=0.3), run_time=0.5)
-                
-                j_ptr.next_to(cells[j][0], UP, buff=0.3)
-                self.play(FadeIn(j_ptr), cells[j][0].animate.set_fill(RED, opacity=0.3), run_time=0.5)
+                j_ptr.next_to(cells[j][0], UP, buff=0.48)
+                self.play(
+                    FadeIn(i_ptr), cells[i][0].animate.set_fill(BLUE, opacity=0.3),
+                    FadeIn(j_ptr), cells[j][0].animate.set_fill(RED, opacity=0.3),
+                    run_time=0.4
+                )
             else:
                 anims = []
                 # Remove old fills
@@ -126,10 +128,10 @@ class BruteForce(Scene):
                 # Move pointers
                 anims.append(i_ptr.animate.next_to(cells[i][0], DOWN, buff=0.3))
                 anims.append(cells[i][0].animate.set_fill(BLUE, opacity=0.3))
-                anims.append(j_ptr.animate.next_to(cells[j][0], UP, buff=0.3))
+                anims.append(j_ptr.animate.next_to(cells[j][0], UP, buff=0.48))
                 anims.append(cells[j][0].animate.set_fill(RED, opacity=0.3))
                 
-                self.play(*anims, run_time=0.5)
+                self.play(*anims, run_time=0.35)
             
             # Show Profit on Graph
             buy_val = prices_array[i]
@@ -144,43 +146,36 @@ class BruteForce(Scene):
                 end=axes.coords_to_point(j, sell_val),
                 color=p_color, stroke_width=3
             )
-            self.play(Create(graph_line), run_time=0.4)
+            self.play(Create(graph_line), run_time=0.25)
             
             # Show calculation
             new_calc = Text(f"Profit: {sell_val} - {buy_val} = {profit}", font=typo.font_code(), font_size=20, color=p_color)
             
-            if i == 0 and j == 1:
+            if idx_pair == 0:
                 new_calc.next_to(algo_text, DOWN, buff=0.5)
-                self.play(FadeIn(new_calc), run_time=0.3)
+                self.play(FadeIn(new_calc), run_time=0.25)
             else:
                 new_calc.move_to(profit_calc.get_center())
-                self.play(ReplacementTransform(profit_calc, new_calc), run_time=0.3)
+                self.play(ReplacementTransform(profit_calc, new_calc), run_time=0.25)
             profit_calc = new_calc
             
             if profit > current_max:
                 current_max = profit
-                self.play(Indicate(profit_calc, color=GREEN), run_time=0.4)
+                self.play(Indicate(profit_calc, color=GREEN), run_time=0.35)
                 
                 new_max_val = Text(str(current_max), font=typo.font_code(), font_size=36, color=GREEN).move_to(max_profit_box.get_center())
-                self.play(ReplacementTransform(max_profit_val, new_max_val), run_time=0.5)
+                self.play(ReplacementTransform(max_profit_val, new_max_val), run_time=0.4)
                 max_profit_val = new_max_val
             else:
-                self.wait(0.3)
+                self.wait(0.2)
                 
-            self.play(FadeOut(graph_line), run_time=0.2)
+            self.play(FadeOut(graph_line), run_time=0.15)
 
-        # ==========================================
-        # 3. FAST FORWARD & CONCLUSION
-        # ==========================================
-        ff_text = Text("... continues for all pairs", font=typo.font_ui(), font_size=16, color=GRAY).next_to(profit_calc, DOWN, buff=0.5)
-        self.play(FadeIn(ff_text), run_time=1)
-        self.wait(1)
-
-        # Clear lower part
+        # Clear simulation elements
         self.play(
-            FadeOut(i_ptr), FadeOut(j_ptr), FadeOut(profit_calc), FadeOut(ff_text),
+            FadeOut(i_ptr), FadeOut(j_ptr), FadeOut(profit_calc),
             *[cells[k][0].animate.set_fill(opacity=0) for k in range(len(prices_array))],
-            run_time=1
+            run_time=0.8
         )
         
         # ==========================================
