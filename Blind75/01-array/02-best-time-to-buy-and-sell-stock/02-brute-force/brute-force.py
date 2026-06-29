@@ -24,7 +24,7 @@ class BruteForce(Scene):
         BLUE = typo.color_blue()
         YELLOW = typo.color_yellow()
         
-        tracker.screen_brute_force("Brute Force: Best Time to Buy and Sell Stock")
+        tracker.screen_brute_force("Brute Force")
 
         # ==========================================
         # 1. LAYOUT SETUP
@@ -35,31 +35,31 @@ class BruteForce(Scene):
         for idx, val in enumerate(prices_array):
             cell_bg = Square(side_length=0.7, color=WHITE, stroke_width=2)
             cell_val = Text(str(val), font=typo.font_code(), font_size=24, color=WHITE)
-            cell_idx = Text(str(idx), font=typo.font_code(), font_size=16, color=GRAY).next_to(cell_bg, UP, buff=0.1)
+            cell_idx = Text(str(idx), font=typo.font_code(), font_size=20, color="#B3B3B3").next_to(cell_bg, UP, buff=0.1)
             cell = VGroup(cell_bg, cell_val, cell_idx)
             cells.add(cell)
         
-        cells.arrange(RIGHT, buff=0).move_to(UP * 2.2 + LEFT * 2)
+        cells.arrange(RIGHT, buff=0).move_to(UP * 1.5 + LEFT * 2)
         
         axes = Axes(
             x_range=[-0.5, 5.5, 1],
             y_range=[0, 8, 2],
             x_length=6,
             y_length=2.5,
-            axis_config={"color": GRAY, "include_numbers": False},
+            axis_config={"color": WHITE, "include_numbers": False},
         )
         
         x_nums = VGroup(*[
-            Text(str(i), font=typo.font_ui(), font_size=12, color=GRAY).next_to(axes.x_axis.n2p(i), DOWN, buff=0.2)
+            Text(str(i), font=typo.font_ui(), font_size=12, color=WHITE).next_to(axes.x_axis.n2p(i), DOWN, buff=0.2)
             for i in range(6)
         ])
         y_nums = VGroup(*[
-            Text(str(i), font=typo.font_ui(), font_size=12, color=GRAY).next_to(axes.y_axis.n2p(i), LEFT, buff=0.2)
+            Text(str(i), font=typo.font_ui(), font_size=12, color=WHITE).next_to(axes.y_axis.n2p(i), LEFT, buff=0.2)
             for i in range(0, 9, 2)
         ])
         
-        x_label = Text("Day", font=typo.font_ui(), font_size=16, color=GRAY).next_to(axes.x_axis, RIGHT, buff=0.1)
-        y_label = Text("Price", font=typo.font_ui(), font_size=16, color=GRAY).next_to(axes.y_axis, UP, buff=0.1)
+        x_label = Text("Day", font=typo.font_ui(), font_size=16, color=WHITE).next_to(axes.x_axis, RIGHT, buff=0.4)
+        y_label = Text("Price", font=typo.font_ui(), font_size=16, color=WHITE).next_to(axes.y_axis, UP, buff=0.3)
         axes_labels = VGroup(x_nums, y_nums, x_label, y_label)
 
         graph_group = VGroup(axes, axes_labels).next_to(cells, DOWN, buff=0.8)
@@ -95,11 +95,11 @@ class BruteForce(Scene):
         # ==========================================
         # 2. SIMULATION LOGIC
         # ==========================================
-        i_arrow = Arrow(start=DOWN, end=UP, color=BLUE, buff=0.1).scale(0.5)
+        i_arrow = Triangle(color=BLUE).scale(0.15).set_fill(BLUE, opacity=1)
         i_label = Text("i (Buy)", font=typo.font_code(), font_size=16, color=BLUE).next_to(i_arrow, DOWN)
         i_ptr = VGroup(i_arrow, i_label)
         
-        j_arrow = Arrow(start=UP, end=DOWN, color=RED, buff=0.1).scale(0.5)
+        j_arrow = Triangle(color=RED).scale(0.15).set_fill(RED, opacity=1).rotate(PI)
         j_label = Text("j (Sell)", font=typo.font_code(), font_size=16, color=RED).next_to(j_arrow, UP)
         j_ptr = VGroup(j_arrow, j_label)
         
@@ -112,10 +112,10 @@ class BruteForce(Scene):
         
         for i, j in iterations_to_show:
             if i == 0 and j == 1:
-                i_ptr.next_to(cells[i][0], DOWN)
+                i_ptr.next_to(cells[i][0], DOWN, buff=0.3)
                 self.play(FadeIn(i_ptr), cells[i][0].animate.set_fill(BLUE, opacity=0.3), run_time=0.5)
                 
-                j_ptr.next_to(cells[j][0], UP)
+                j_ptr.next_to(cells[j][0], UP, buff=0.3)
                 self.play(FadeIn(j_ptr), cells[j][0].animate.set_fill(RED, opacity=0.3), run_time=0.5)
             else:
                 anims = []
@@ -124,9 +124,9 @@ class BruteForce(Scene):
                     anims.append(cells[k][0].animate.set_fill(opacity=0))
                 
                 # Move pointers
-                anims.append(i_ptr.animate.next_to(cells[i][0], DOWN))
+                anims.append(i_ptr.animate.next_to(cells[i][0], DOWN, buff=0.3))
                 anims.append(cells[i][0].animate.set_fill(BLUE, opacity=0.3))
-                anims.append(j_ptr.animate.next_to(cells[j][0], UP))
+                anims.append(j_ptr.animate.next_to(cells[j][0], UP, buff=0.3))
                 anims.append(cells[j][0].animate.set_fill(RED, opacity=0.3))
                 
                 self.play(*anims, run_time=0.5)
@@ -148,13 +148,13 @@ class BruteForce(Scene):
             
             # Show calculation
             new_calc = Text(f"Profit: {sell_val} - {buy_val} = {profit}", font=typo.font_code(), font_size=20, color=p_color)
-            new_calc.move_to(profit_calc.get_center())
-            if profit_calc.text == "":
+            
+            if i == 0 and j == 1:
                 new_calc.next_to(algo_text, DOWN, buff=0.5)
                 self.play(FadeIn(new_calc), run_time=0.3)
             else:
                 new_calc.move_to(profit_calc.get_center())
-                self.play(Transform(profit_calc, new_calc), run_time=0.3)
+                self.play(ReplacementTransform(profit_calc, new_calc), run_time=0.3)
             profit_calc = new_calc
             
             if profit > current_max:
@@ -162,7 +162,7 @@ class BruteForce(Scene):
                 self.play(Indicate(profit_calc, color=GREEN), run_time=0.4)
                 
                 new_max_val = Text(str(current_max), font=typo.font_code(), font_size=36, color=GREEN).move_to(max_profit_box.get_center())
-                self.play(Transform(max_profit_val, new_max_val), run_time=0.5)
+                self.play(ReplacementTransform(max_profit_val, new_max_val), run_time=0.5)
                 max_profit_val = new_max_val
             else:
                 self.wait(0.3)
@@ -183,7 +183,10 @@ class BruteForce(Scene):
             run_time=1
         )
         
-        tracker.show_lower_third("Complexity Analysis", "Time: O(N²), Space: O(1) - Too slow for large inputs", color_type="red")
+        complexity_title = Text("Complexity Analysis", font=typo.font_ui(), font_size=20, color=GRAY)
+        complexity_val = Text("Time: O(N²), Space: O(1)", font=typo.font_code(), font_size=20, color=RED)
+        complexity_group = VGroup(complexity_title, complexity_val).arrange(DOWN, aligned_edge=RIGHT).to_corner(DR, buff=0.5)
+        self.play(FadeIn(complexity_group))
         self.wait(3)
 
 if __name__ == "__main__":
