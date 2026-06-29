@@ -183,10 +183,10 @@ class BruteForce(Scene):
             run_time=1
         )
         
-        complexity_title = Text("Complexity Analysis", font=typo.font_ui(), font_size=20, color=GRAY)
-        complexity_val = Text("Time: O(N²), Space: O(1)", font=typo.font_code(), font_size=20, color=RED)
-        complexity_group = VGroup(complexity_title, complexity_val).arrange(DOWN, aligned_edge=RIGHT).to_corner(DR, buff=0.5)
-        self.play(FadeIn(complexity_group))
+        # ==========================================
+        # 4. COMPLEXITY ANALYSIS
+        # ==========================================
+        tracker.show_lower_third("Complexity Analysis", "Time: O(N²), Space: O(1)", color_type="red", position="right")
         self.wait(3)
 
 if __name__ == "__main__":
