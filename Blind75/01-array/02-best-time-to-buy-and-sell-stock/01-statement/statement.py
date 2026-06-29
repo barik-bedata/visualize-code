@@ -27,20 +27,11 @@ class Statement(Scene):
         # ==========================================
         # 1. SCREEN TITLE & DESCRIPTION
         # ==========================================
-        tracker.screen_statement("Statement: Best Time to Buy and Sell Stock")
+        tracker.screen_statement("Problem Statement")
 
         # ==========================================
-        # 2. PROBLEM STATEMENT & ARRAY
+        # 2. ARRAY
         # ==========================================
-        statement_text = Text(
-            "Find the maximum profit you can achieve by buying on one day\nand selling on a different day in the future.",
-            font=typo.font_ui(), font_size=20, color=WHITE
-        )
-        statement_text.move_to(UP * 2.2)
-        
-        self.play(FadeIn(statement_text), run_time=1)
-        self.wait(1)
-        
         prices_label = Text("prices =", font=typo.font_code(), font_size=24, color=WHITE)
         prices_array = [7, 1, 5, 3, 6, 4]
         
@@ -48,13 +39,15 @@ class Statement(Scene):
         for idx, val in enumerate(prices_array):
             cell_bg = Square(side_length=0.7, color=WHITE, stroke_width=2)
             cell_val = Text(str(val), font=typo.font_code(), font_size=24, color=WHITE)
-            cell_idx = Text(str(idx), font=typo.font_code(), font_size=16, color=GRAY).next_to(cell_bg, UP, buff=0.1)
+            cell_idx = Text(str(idx), font=typo.font_code(), font_size=20, color="#B3B3B3").next_to(cell_bg, UP, buff=0.1)
             cell = VGroup(cell_bg, cell_val, cell_idx)
             cells.add(cell)
         
         cells.arrange(RIGHT, buff=0)
-        array_group = VGroup(prices_label, cells).arrange(RIGHT, buff=0.5)
-        array_group.next_to(statement_text, DOWN, buff=0.5)
+        prices_label.next_to(cells, LEFT, buff=0.5)
+        prices_label.match_y(cells[0][0])
+        array_group = VGroup(prices_label, cells)
+        array_group.move_to(UP * 1.8)
         
         self.play(FadeIn(array_group, shift=UP * 0.3), run_time=1)
         self.wait(1)
@@ -67,24 +60,24 @@ class Statement(Scene):
             y_range=[0, 8, 2],
             x_length=7,
             y_length=3,
-            axis_config={"color": GRAY, "include_numbers": False},
+            axis_config={"color": WHITE, "include_numbers": False},
         )
         
         # Add Custom Numbers using Text to avoid LaTeX
         x_nums = VGroup(*[
-            Text(str(i), font=typo.font_ui(), font_size=12, color=GRAY)
+            Text(str(i), font=typo.font_ui(), font_size=12, color=WHITE)
             .next_to(axes.x_axis.n2p(i), DOWN, buff=0.2)
             for i in range(6)
         ])
         y_nums = VGroup(*[
-            Text(str(i), font=typo.font_ui(), font_size=12, color=GRAY)
+            Text(str(i), font=typo.font_ui(), font_size=12, color=WHITE)
             .next_to(axes.y_axis.n2p(i), LEFT, buff=0.2)
             for i in range(0, 9, 2)
         ])
         
         # Add titles to axes manually using Typography fonts to avoid missing font issues
-        x_label = Text("Day", font=typo.font_ui(), font_size=16, color=GRAY).next_to(axes.x_axis, RIGHT, buff=0.1)
-        y_label = Text("Price", font=typo.font_ui(), font_size=16, color=GRAY).next_to(axes.y_axis, UP, buff=0.1)
+        x_label = Text("Day", font=typo.font_ui(), font_size=16, color=WHITE).next_to(axes.x_axis, RIGHT, buff=0.4)
+        y_label = Text("Price", font=typo.font_ui(), font_size=16, color=WHITE).next_to(axes.y_axis, UP, buff=0.3)
         axes_labels = VGroup(x_nums, y_nums, x_label, y_label)
 
         graph_group = VGroup(axes, axes_labels).next_to(array_group, DOWN, buff=0.5)
@@ -112,8 +105,8 @@ class Statement(Scene):
         buy_cell = cells[buy_idx][0]
         
         buy_text = Text("Buy", font=typo.font_ui(), font_size=20, weight=BOLD, color=GREEN)
-        buy_arrow = Arrow(start=DOWN, end=UP, color=GREEN, buff=0.1).scale(0.5)
-        buy_arrow.next_to(buy_dot, DOWN)
+        buy_arrow = Triangle(color=GREEN).scale(0.15).set_fill(GREEN, opacity=1)
+        buy_arrow.next_to(buy_dot, DOWN, buff=0.1)
         buy_text.next_to(buy_arrow, DOWN)
         buy_group = VGroup(buy_arrow, buy_text)
         
@@ -131,8 +124,8 @@ class Statement(Scene):
         sell_cell = cells[sell_idx][0]
         
         sell_text = Text("Sell", font=typo.font_ui(), font_size=20, weight=BOLD, color=RED)
-        sell_arrow = Arrow(start=UP, end=DOWN, color=RED, buff=0.1).scale(0.5)
-        sell_arrow.next_to(sell_dot, UP)
+        sell_arrow = Triangle(color=RED).scale(0.15).set_fill(RED, opacity=1).rotate(PI)
+        sell_arrow.next_to(sell_dot, UP, buff=0.1)
         sell_text.next_to(sell_arrow, UP)
         sell_group = VGroup(sell_arrow, sell_text)
         
@@ -165,7 +158,8 @@ class Statement(Scene):
         
         profit_val = prices_array[sell_idx] - prices_array[buy_idx]
         profit_text = Text(f"Profit = {profit_val}", font=typo.font_code(), font_size=20, weight=BOLD, color=GREEN)
-        profit_text.next_to(profit_line, RIGHT, buff=0.2)
+        profit_text.next_to(axes, RIGHT, buff=1.0)
+        profit_text.match_y(profit_line)
         
         self.play(Write(profit_text), run_time=1)
         self.wait(2)
