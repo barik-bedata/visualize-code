@@ -333,5 +333,5 @@ class Walkthrough(Scene):
         self.play(FadeOut(h_rect))
 
         # --- lower third ---
-        tracker.show_lower_third("Complexity Analysis", "Time: O(N), Space: O(N)", color_type="green")
+        tracker.show_lower_third("Complexity Analysis", "Time: O(N), Space: O(N)", color_type="green", position="right")
         self.wait(3)

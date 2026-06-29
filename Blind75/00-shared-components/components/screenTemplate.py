@@ -18,7 +18,7 @@ class IScreenTemplate(ABC):
 
     # ── Lower Third ──
     @abstractmethod
-    def show_lower_third(self, title: str, subtitle: str, color_type: str = "blue") -> None: pass
+    def show_lower_third(self, title: str, subtitle: str, color_type: str = "blue", position: str = "left") -> None: pass
     @abstractmethod
     def hide_lower_third(self) -> None: pass
 
@@ -71,7 +71,7 @@ class ScreenTemplate(IScreenTemplate):
         self.__update_tracker(text, self.__typo.color_green())
 
     # ── Public: Lower Third ──
-    def show_lower_third(self, title: str, subtitle: str, color_type: str = "blue") -> None:
+    def show_lower_third(self, title: str, subtitle: str, color_type: str = "blue", position: str = "left") -> None:
         color_map = {
             "white":  self.__typo.color_white(),
             "red":    self.__typo.color_red(),
@@ -86,15 +86,22 @@ class ScreenTemplate(IScreenTemplate):
         subtitle_mob= Text(subtitle, font=self.__typo.font_code(), font_size=16, color=self.__typo.color_secondary())
 
         text_group  = VGroup(title_mob, subtitle_mob).arrange(DOWN, aligned_edge=LEFT, buff=0.12)
-        lt_group    = VGroup(accent_bar, text_group).arrange(RIGHT, buff=0.25, aligned_edge=ORIGIN)
-        lt_group.to_edge(DOWN + LEFT, buff=0.6)
+        
+        if position.lower() == "right":
+            lt_group = VGroup(text_group, accent_bar).arrange(RIGHT, buff=0.25, aligned_edge=ORIGIN)
+            lt_group.to_edge(DOWN + RIGHT, buff=0.6)
+            shift_dir = LEFT
+        else:
+            lt_group = VGroup(accent_bar, text_group).arrange(RIGHT, buff=0.25, aligned_edge=ORIGIN)
+            lt_group.to_edge(DOWN + LEFT, buff=0.6)
+            shift_dir = RIGHT
 
         if self.__current_lower_third is not None:
             self.__scene.play(ReplacementTransform(self.__current_lower_third, lt_group), run_time=0.8)
         else:
             self.__scene.play(
                 GrowFromCenter(accent_bar, run_time=0.4),
-                FadeIn(text_group, shift=RIGHT * 0.3, run_time=0.6),
+                FadeIn(text_group, shift=shift_dir * 0.3, run_time=0.6),
                 rate_func=smooth,
             )
 

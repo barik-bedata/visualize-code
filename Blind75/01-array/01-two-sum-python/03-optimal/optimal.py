@@ -70,7 +70,7 @@ class HashMapSolution(Scene):
         # ৩. STRUCTURED TWO-COLUMN TABLE SETUP
         # ==========================================
         
-        map_title = Text("Hash Map", font="Sans", font_size=24, weight=BOLD, color=WHITE)
+        map_title = Text("Dictionary", font="Sans", font_size=24, weight=BOLD, color=WHITE)
         map_title.move_to(RIGHT * 4.0 + UP * 1.0)
         
         map_box = RoundedRectangle(corner_radius=0.15, width=3.6, height=2.8, color=GRAY, stroke_width=2.5, fill_opacity=0)
