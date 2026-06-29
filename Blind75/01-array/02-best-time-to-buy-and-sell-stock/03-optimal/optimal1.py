@@ -7,7 +7,7 @@ import numpy as np
 
 config.flush_cache = True
 
-class Optimal(Scene):
+class Optimal1(Scene):
     def construct(self):
         from components.typography import Typography, ITypography
         from components.screenTemplate import ScreenTemplate, IScreenTemplate
@@ -29,40 +29,41 @@ class Optimal(Scene):
         # ==========================================
         # 1. LAYOUT SETUP
         # ==========================================
-        prices_array = [7, 1, 5, 3, 6, 4]
+        # Storyline Array: up, down, down, up, up, down, ALL TIME LOW (1), up, small down, UP (10)
+        prices_array = [6, 9, 4, 3, 6, 8, 5, 1, 7, 5, 10]
         
         cells = VGroup()
         for idx, val in enumerate(prices_array):
-            cell_bg = Square(side_length=0.7, color=WHITE, stroke_width=2)
-            cell_val = Text(str(val), font=typo.font_code(), font_size=24, color=WHITE)
-            cell_idx = Text(str(idx), font=typo.font_code(), font_size=20, color="#B3B3B3").next_to(cell_bg, UP, buff=0.1)
+            cell_bg = Square(side_length=0.55, color=WHITE, stroke_width=2)
+            cell_val = Text(str(val), font=typo.font_code(), font_size=20, color=WHITE)
+            cell_idx = Text(str(idx), font=typo.font_code(), font_size=16, color="#B3B3B3").next_to(cell_bg, UP, buff=0.1)
             cell = VGroup(cell_bg, cell_val, cell_idx)
             cells.add(cell)
         
-        cells.arrange(RIGHT, buff=0).move_to(UP * 1.5 + LEFT * 2)
+        cells.arrange(RIGHT, buff=0).move_to(UP * 1.6 + LEFT * 1.5)
         
         axes = Axes(
-            x_range=[-0.8, 5.5, 1],
-            y_range=[-0.8, 9.5, 2],
-            x_length=6.3,
+            x_range=[-0.8, 10.5, 1],
+            y_range=[-0.8, 11.5, 2],
+            x_length=7.5,
             y_length=3.0,
             axis_config={"color": WHITE, "include_numbers": False},
         )
         
         x_nums = VGroup(*[
-            Text(str(i), font=typo.font_ui(), font_size=12, color=WHITE).next_to(axes.x_axis.n2p(i), DOWN, buff=0.2)
-            for i in range(6)
+            Text(str(i), font=typo.font_ui(), font_size=11, color=WHITE).next_to(axes.x_axis.n2p(i), DOWN, buff=0.2)
+            for i in range(11)
         ])
         y_nums = VGroup(*[
-            Text(str(i), font=typo.font_ui(), font_size=12, color=WHITE).next_to(axes.y_axis.n2p(i), LEFT, buff=0.2)
-            for i in range(0, 9, 2)
+            Text(str(i), font=typo.font_ui(), font_size=11, color=WHITE).next_to(axes.y_axis.n2p(i), LEFT, buff=0.2)
+            for i in range(0, 11, 2)
         ])
         
-        x_label = Text("Day", font=typo.font_ui(), font_size=16, color=WHITE).next_to(axes.x_axis, RIGHT, buff=0.4)
-        y_label = Text("Price", font=typo.font_ui(), font_size=16, color=WHITE).next_to(axes.y_axis, UP, buff=0.3)
+        x_label = Text("Day", font=typo.font_ui(), font_size=15, color=WHITE).next_to(axes.x_axis, RIGHT, buff=0.3)
+        y_label = Text("Price", font=typo.font_ui(), font_size=15, color=WHITE).next_to(axes.y_axis, UP, buff=0.3)
         axes_labels = VGroup(x_nums, y_nums, x_label, y_label)
 
-        graph_group = VGroup(axes, axes_labels).next_to(cells, DOWN, buff=0.8)
+        graph_group = VGroup(axes, axes_labels).next_to(cells, DOWN, buff=0.7)
         
         points = [axes.coords_to_point(i, p) for i, p in enumerate(prices_array)]
         line_graph = VMobject()
@@ -72,14 +73,14 @@ class Optimal(Scene):
         
         # Trackers Box
         tracker_box = RoundedRectangle(corner_radius=0.1, width=3.2, height=1.8, color=GRAY, stroke_width=2)
-        tracker_box.move_to(RIGHT * 3.5 + UP * 1)
+        tracker_box.move_to(RIGHT * 4.4 + UP * 1)
         
-        min_price_title = Text("Min Price Seen: ", font=typo.font_ui(), font_size=16, color=GRAY)
-        min_price_val = Text("∞", font=typo.font_code(), font_size=28, color=RED)
+        min_price_title = Text("Min Price Seen: ", font=typo.font_ui(), font_size=15, color=GRAY)
+        min_price_val = Text("∞", font=typo.font_code(), font_size=26, color=RED)
         min_group = VGroup(min_price_title, min_price_val).arrange(RIGHT, buff=0.15)
         
-        max_profit_title = Text("Max Profit: ", font=typo.font_ui(), font_size=16, color=GRAY)
-        max_profit_val = Text("0", font=typo.font_code(), font_size=28, color=GREEN)
+        max_profit_title = Text("Max Profit: ", font=typo.font_ui(), font_size=15, color=GRAY)
+        max_profit_val = Text("0", font=typo.font_code(), font_size=26, color=GREEN)
         max_group = VGroup(max_profit_title, max_profit_val).arrange(RIGHT, buff=0.15)
         
         trackers = VGroup(min_group, max_group).arrange(DOWN, buff=0.25, aligned_edge=LEFT)
@@ -87,8 +88,8 @@ class Optimal(Scene):
 
         algo_text = Text(
             "Iterate once (O(N)).\nTrack min_price & max_profit.",
-            font=typo.font_code(), font_size=16, color=WHITE
-        ).next_to(tracker_box, DOWN, buff=0.5)
+            font=typo.font_code(), font_size=15, color=WHITE
+        ).next_to(tracker_box, DOWN, buff=0.4)
 
         self.play(
             FadeIn(cells), Create(axes), FadeIn(axes_labels), 
@@ -116,26 +117,26 @@ class Optimal(Scene):
             # Move pointer
             if i == 0:
                 i_ptr.next_to(cells[i][0], DOWN, buff=0.3)
-                self.play(FadeIn(i_ptr), cells[i][0].animate.set_fill(BLUE, opacity=0.3), run_time=0.5)
+                self.play(FadeIn(i_ptr), cells[i][0].animate.set_fill(BLUE, opacity=0.3), run_time=0.4)
             else:
                 self.play(
                     i_ptr.animate.next_to(cells[i][0], DOWN, buff=0.3),
                     cells[i-1][0].animate.set_fill(opacity=0),
                     cells[i][0].animate.set_fill(BLUE, opacity=0.3),
-                    run_time=0.5
+                    run_time=0.4
                 )
             
             # Highlight current point
-            self.play(Indicate(dots[i], color=BLUE, scale_factor=2), run_time=0.4)
+            self.play(Indicate(dots[i], color=BLUE, scale_factor=2), run_time=0.35)
             
             # Update min_price
             if p < current_min:
                 current_min = p
-                new_min_val = Text(str(current_min), font=typo.font_code(), font_size=28, color=RED).move_to(min_price_val.get_center())
+                new_min_val = Text(str(current_min), font=typo.font_code(), font_size=26, color=RED).move_to(min_price_val.get_center())
                 
                 new_min_line = DashedLine(
                     start=axes.c2p(-0.8, current_min),
-                    end=axes.c2p(5.5, current_min),
+                    end=axes.c2p(10.5, current_min),
                     color=RED, stroke_width=2
                 )
                 
@@ -143,13 +144,13 @@ class Optimal(Scene):
                     self.play(
                         ReplacementTransform(min_price_val, new_min_val),
                         Create(new_min_line),
-                        run_time=0.5
+                        run_time=0.4
                     )
                 else:
                     self.play(
                         ReplacementTransform(min_price_val, new_min_val),
                         ReplacementTransform(min_line, new_min_line),
-                        run_time=0.5
+                        run_time=0.4
                     )
                 min_price_val = new_min_val
                 min_line = new_min_line
@@ -163,17 +164,17 @@ class Optimal(Scene):
                     end=axes.c2p(i, p),
                     color=GREEN, stroke_width=6
                 )
-                self.play(Create(profit_segment), run_time=0.4)
+                self.play(Create(profit_segment), run_time=0.35)
                 
                 if profit > current_max:
                     current_max = profit
-                    new_max_val = Text(str(current_max), font=typo.font_code(), font_size=28, color=GREEN).move_to(max_profit_val.get_center())
-                    self.play(ReplacementTransform(max_profit_val, new_max_val), Indicate(profit_segment, color=WHITE), run_time=0.5)
+                    new_max_val = Text(str(current_max), font=typo.font_code(), font_size=26, color=GREEN).move_to(max_profit_val.get_center())
+                    self.play(ReplacementTransform(max_profit_val, new_max_val), Indicate(profit_segment, color=WHITE), run_time=0.4)
                     max_profit_val = new_max_val
                 
-                self.play(FadeOut(profit_segment), run_time=0.3)
+                self.play(FadeOut(profit_segment), run_time=0.25)
             else:
-                self.wait(0.4)
+                self.wait(0.3)
 
         # ==========================================
         # 3. CONCLUSION
@@ -195,5 +196,5 @@ if __name__ == "__main__":
     config.pixel_height = 1080
     config.pixel_width = 1920
     config.frame_rate = 60
-    scene = Optimal()
+    scene = Optimal1()
     scene.render()

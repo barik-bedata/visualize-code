@@ -42,10 +42,10 @@ class BruteForce(Scene):
         cells.arrange(RIGHT, buff=0).move_to(UP * 1.5 + LEFT * 2)
         
         axes = Axes(
-            x_range=[-0.5, 5.5, 1],
-            y_range=[0, 8, 2],
-            x_length=6,
-            y_length=2.5,
+            x_range=[-0.8, 5.5, 1],
+            y_range=[-0.8, 9.5, 2],
+            x_length=6.3,
+            y_length=3.0,
             axis_config={"color": WHITE, "include_numbers": False},
         )
         
