@@ -123,13 +123,17 @@ class WalkthroughPython(Scene):
         start_y = code_block[1][0].get_y()
         line_spacing = code_block[1][0].get_y() - code_block[1][1].get_y()
         
-        h_rect = Rectangle(width=code_block[0].width - 0.1, height=line_spacing + 0.1, color=YELLOW, stroke_width=2)
-        h_rect.set_fill(YELLOW, opacity=0.3)
-        h_rect.set_z_index(-1)
-        code_block.set_z_index(1)
+        h_rect = Rectangle(width=code_block[0].width - 0.1, height=line_spacing, color=YELLOW, stroke_width=2)
+        h_rect.set_fill(YELLOW, opacity=0)
+        
+        # Proper Z-index so highlight is above background but below text
+        code_block[0].set_z_index(0)
+        h_rect.set_z_index(1)
+        for i in range(1, len(code_block)):
+            code_block[i].set_z_index(2)
         
         def highlight_line(line_num):
-            target_y = start_y - (line_num - 1) * line_spacing
+            target_y = start_y - (line_num - 1) * line_spacing - 0.08
             target_pos = np.array([code_block[0].get_center()[0], target_y, 0])
             return h_rect.animate.move_to(target_pos)
 
@@ -151,7 +155,7 @@ class WalkthroughPython(Scene):
         i_ptr = VGroup(i_arrow, i_label)
 
         # Line 3: int min_price = Integer.MAX_VALUE;
-        h_rect.move_to(np.array([code_block[0].get_center()[0], start_y - 2 * line_spacing, 0]))
+        h_rect.move_to(np.array([code_block[0].get_center()[0], start_y - 2 * line_spacing - 0.08, 0]))
         self.play(FadeIn(h_rect))
         self.play(Indicate(min_price_val, color=RED), run_time=1)
         
