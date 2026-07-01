@@ -136,7 +136,7 @@ class WalkthroughJava(Scene):
             code_block[i].set_z_index(2)
         
         def highlight_line(line_num):
-            target_y = start_y - (line_num - 1) * line_spacing - 0.08
+            target_y = start_y - (line_num - 1) * line_spacing - 0.045
             target_pos = np.array([code_block[0].get_center()[0], target_y, 0])
             return h_rect.animate.move_to(target_pos)
 
@@ -158,7 +158,7 @@ class WalkthroughJava(Scene):
         i_ptr = VGroup(i_arrow, i_label)
 
         # Line 3: int minPrice = Integer.MAX_VALUE;
-        h_rect.move_to(np.array([code_block[0].get_center()[0], start_y - 2 * line_spacing - 0.08, 0]))
+        h_rect.move_to(np.array([code_block[0].get_center()[0], start_y - 2 * line_spacing - 0.05, 0]))
         self.play(FadeIn(h_rect))
         self.play(Indicate(min_price_val, color=RED), run_time=1)
         
