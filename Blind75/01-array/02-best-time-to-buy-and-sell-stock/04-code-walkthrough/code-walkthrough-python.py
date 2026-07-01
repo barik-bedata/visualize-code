@@ -53,12 +53,18 @@ class WalkthroughPython(Scene):
         
         max_profit_title = Text("max_profit:", font=typo.font_code(), font_size=18, color=LIGHT_TEXT)
         max_profit_val = Text("0", font=typo.font_code(), font_size=20, color=GREEN)
+
+        # Align titles left-aligned in a VGroup
+        titles_group = VGroup(min_price_title, max_profit_title).arrange(DOWN, buff=0.25, aligned_edge=LEFT)
+        titles_group.move_to(tracker_box.get_center())
+        titles_group.shift(LEFT * 0.6) # Shift slightly left to make space for values
         
-        trackers = VGroup(
-            VGroup(min_price_title, min_price_val).arrange(RIGHT, buff=0.2),
-            VGroup(max_profit_title, max_profit_val).arrange(RIGHT, buff=0.2)
-        ).arrange(DOWN, buff=0.2, aligned_edge=LEFT)
-        trackers.move_to(tracker_box.get_center())
+        # Align the values' left edges at a fixed distance to the right of the titles
+        x_align = titles_group.get_right()[0] + 0.3
+        min_price_val.move_to([x_align + min_price_val.width/2, min_price_title.get_y(), 0])
+        max_profit_val.move_to([x_align + max_profit_val.width/2, max_profit_title.get_y(), 0])
+        
+        trackers = VGroup(titles_group, min_price_val, max_profit_val)
         tracker_group = VGroup(tracker_box, trackers)
         
         # Graph
@@ -133,7 +139,7 @@ class WalkthroughPython(Scene):
             code_block[i].set_z_index(2)
         
         def highlight_line(line_num):
-            target_y = start_y - (line_num - 1) * line_spacing - 0.08
+            target_y = code_block[1][line_num - 1].get_center()[1]
             target_pos = np.array([code_block[0].get_center()[0], target_y, 0])
             return h_rect.animate.move_to(target_pos)
 
@@ -142,7 +148,7 @@ class WalkthroughPython(Scene):
         # ==========================================
         self.play(
             FadeIn(array_group),
-            FadeIn(tracker_group),
+            FadeIn(tracker_box),
             FadeIn(axes), FadeIn(axes_labels), Create(line_graph), FadeIn(dots),
             FadeIn(code_block),
             run_time=2
@@ -155,12 +161,21 @@ class WalkthroughPython(Scene):
         i_ptr = VGroup(i_arrow, i_label)
 
         # Line 3: int min_price = Integer.MAX_VALUE;
-        h_rect.move_to(np.array([code_block[0].get_center()[0], start_y - 2 * line_spacing - 0.08, 0]))
-        self.play(FadeIn(h_rect))
+        target_y = code_block[1][2].get_center()[1]
+        h_rect.move_to(np.array([code_block[0].get_center()[0], target_y, 0]))
+        self.play(
+            FadeIn(h_rect),
+            FadeIn(min_price_title),
+            FadeIn(min_price_val)
+        )
         self.play(Indicate(min_price_val, color=RED), run_time=1)
         
         # Line 4: int max_profit = 0;
-        self.play(highlight_line(4))
+        self.play(
+            highlight_line(4),
+            FadeIn(max_profit_title),
+            FadeIn(max_profit_val)
+        )
         self.play(Indicate(max_profit_val, color=GREEN), run_time=1)
         
         # Line 6: for loop
@@ -196,7 +211,8 @@ class WalkthroughPython(Scene):
             
             if p < current_min:
                 current_min = p
-                new_min_val = Text(str(current_min), font=typo.font_code(), font_size=20, color=RED).move_to(min_price_val.get_center())
+                new_min_val = Text(str(current_min), font=typo.font_code(), font_size=20, color=RED)
+                new_min_val.align_to(min_price_val, LEFT).match_y(min_price_val)
                 
                 new_min_line = DashedLine(
                     start=axes.c2p(-0.8, current_min),
@@ -206,13 +222,15 @@ class WalkthroughPython(Scene):
                 
                 if min_line is None:
                     self.play(
-                        ReplacementTransform(min_price_val, new_min_val),
+                        FadeOut(min_price_val),
+                        FadeIn(new_min_val),
                         Create(new_min_line),
                         run_time=0.5
                     )
                 else:
                     self.play(
-                        ReplacementTransform(min_price_val, new_min_val),
+                        FadeOut(min_price_val),
+                        FadeIn(new_min_val),
                         ReplacementTransform(min_line, new_min_line),
                         run_time=0.5
                     )
@@ -235,8 +253,14 @@ class WalkthroughPython(Scene):
                 
                 if profit > current_max:
                     current_max = profit
-                    new_max_val = Text(str(current_max), font=typo.font_code(), font_size=20, color=GREEN).move_to(max_profit_val.get_center())
-                    self.play(ReplacementTransform(max_profit_val, new_max_val), Indicate(profit_segment, color=LIGHT_TEXT), run_time=0.5)
+                    new_max_val = Text(str(current_max), font=typo.font_code(), font_size=20, color=GREEN)
+                    new_max_val.align_to(max_profit_val, LEFT).match_y(max_profit_val)
+                    self.play(
+                        FadeOut(max_profit_val),
+                        FadeIn(new_max_val),
+                        Indicate(profit_segment, color=LIGHT_TEXT),
+                        run_time=0.5
+                    )
                     max_profit_val = new_max_val
                 
                 self.play(FadeOut(profit_segment), run_time=0.3)
