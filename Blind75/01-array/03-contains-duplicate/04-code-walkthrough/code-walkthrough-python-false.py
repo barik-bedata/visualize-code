@@ -7,7 +7,7 @@ import numpy as np
 
 config.flush_cache = True
 
-class OptimalJava(Scene):
+class WalkthroughPythonFalse(Scene):
     def construct(self):
         from components.typography import Typography, ITypography
         from components.screenTemplate import ScreenTemplate, IScreenTemplate
@@ -23,13 +23,11 @@ class OptimalJava(Scene):
         RED = typo.color_red()
         BLUE = typo.color_blue()
         YELLOW = typo.color_yellow()
-        
-        tracker.screen_optimal_approach("Optimal - Java (HashSet)")
 
         # ==========================================
         # 1. LAYOUT SETUP
         # ==========================================
-        nums_array = [1, 2, 3, 4, 5, 6, 6]
+        nums_array = [1, 2, 3, 4, 5, 6]
         
         cells = VGroup()
         for idx, val in enumerate(nums_array):
@@ -57,25 +55,21 @@ class OptimalJava(Scene):
         # ==========================================
         # 2. CODE BLOCK SETUP
         # ==========================================
-        java_code = """class Solution {
-    public boolean containsDuplicate(int[] nums) {
-        Set<Integer> seen = new HashSet<>();
+        python_code = """class Solution:
+    def containsDuplicate(self, nums: List[int]) -> bool:
+        seen = set()
         
-        for (int num : nums) {
-            if (seen.contains(num)) {
-                return true;
-            }
-            seen.add(num);
-        }
-        
-        return false;
-    }
-}"""
+        for num in nums:
+            if num in seen:
+                return True
+            seen.add(num)
+            
+        return False"""
         code_block = Code(
-            code_string=java_code,
+            code_string=python_code,
             tab_width=4,
             background="window",
-            language="java",
+            language="python",
             formatter_style="monokai"
         ).scale(0.8)
 
@@ -110,7 +104,7 @@ class OptimalJava(Scene):
         )
         self.wait(1)
 
-        # Line 3: Set<Integer> seen = new HashSet<>();
+        # Line 3: seen = set()
         h_rect.move_to(np.array([code_block[0].get_center()[0], start_y - 2 * line_spacing - 0.045, 0]))
         self.play(FadeIn(h_rect), FadeIn(set_group))
         
@@ -124,7 +118,7 @@ class OptimalJava(Scene):
             if found_duplicate:
                 break
                 
-            # Line 5: for (int num : nums) {
+            # Line 5: for num in nums
             self.play(highlight_line(5), run_time=0.5)
             
             if i == 0:
@@ -138,7 +132,7 @@ class OptimalJava(Scene):
                     run_time=0.5
                 )
 
-            # Line 6: if (seen.contains(num)) {
+            # Line 6: if num in seen:
             self.play(highlight_line(6), run_time=0.5)
             
             # Check if num in set
@@ -153,15 +147,23 @@ class OptimalJava(Scene):
                     break
                     
             if exists:
-                # Line 7: return true;
+                # Line 7: return True
                 self.play(highlight_line(7), run_time=0.5)
-                self.play(Indicate(cells[i][0], color=RED, scale_factor=1.2), run_time=1)
+                self.play(Indicate(cells[i][0], color=GREEN, scale_factor=1.2), run_time=1)
+                
+                ans_box = RoundedRectangle(corner_radius=0.1, width=1.4, height=0.7, color=GREEN, stroke_width=2).next_to(set_box, DOWN, buff=0.5)
+                ans_text = Text("True", font=typo.font_code(), font_size=24, color=GREEN, weight=BOLD).move_to(ans_box.get_center())
+                ans_group = VGroup(ans_box, ans_text)
+                
+                self.play(FadeIn(ans_group), run_time=0.5)
+                self.play(Indicate(ans_group, scale_factor=1.2, color=GREEN), run_time=1)
+                
                 found_duplicate = True
             else:
                 self.wait(0.3)
                 
-                # Line 9: seen.add(num);
-                self.play(highlight_line(9), run_time=0.5)
+                # Line 8: seen.add(num)
+                self.play(highlight_line(8), run_time=0.5)
                 
                 new_elem = Text(str(curr_val), font=typo.font_code(), font_size=24, color=WHITE)
                 if len(set_elements) == 0:
@@ -182,6 +184,17 @@ class OptimalJava(Scene):
                 
         self.play(FadeOut(h_rect))
         
+        # Line 10: return False
+        self.play(highlight_line(10), run_time=0.5)
+        
+        ans_box = RoundedRectangle(corner_radius=0.1, width=1.4, height=0.7, color=RED, stroke_width=2).next_to(set_box, DOWN, buff=0.5)
+        ans_text = Text("False", font=typo.font_code(), font_size=24, color=RED, weight=BOLD).move_to(ans_box.get_center())
+        ans_group = VGroup(ans_box, ans_text)
+        
+        self.play(FadeIn(ans_group), run_time=0.5)
+        self.play(Indicate(ans_group, scale_factor=1.2, color=RED), run_time=1)
+
+        
         # --- lower third ---
         tracker.show_lower_third("Complexity Analysis", "Time: O(N), Space: O(N)", color_type="green", position="right")
         self.wait(3)
@@ -191,5 +204,5 @@ if __name__ == "__main__":
     config.pixel_height = 1080
     config.pixel_width = 1920
     config.frame_rate = 60
-    scene = OptimalJava()
+    scene = WalkthroughPythonFalse()
     scene.render()

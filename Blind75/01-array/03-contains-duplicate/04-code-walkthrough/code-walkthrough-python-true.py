@@ -27,7 +27,7 @@ class WalkthroughPython(Scene):
         # ==========================================
         # 1. LAYOUT SETUP
         # ==========================================
-        nums_array = [1, 2, 3, 1]
+        nums_array = [1, 2, 3, 4, 5, 6, 6]
         
         cells = VGroup()
         for idx, val in enumerate(nums_array):
@@ -74,7 +74,7 @@ class WalkthroughPython(Scene):
         ).scale(0.8)
 
         main_layout = VGroup(left_column, code_block).arrange(RIGHT, buff=1.0)
-        main_layout.scale_to_fit_height(6.0)
+        main_layout.scale_to_fit_width(12.0)
         main_layout.move_to(ORIGIN)
 
         # Highlighter logic
@@ -149,7 +149,15 @@ class WalkthroughPython(Scene):
             if exists:
                 # Line 7: return True
                 self.play(highlight_line(7), run_time=0.5)
-                self.play(Indicate(cells[i][0], color=RED, scale_factor=1.2), run_time=1)
+                self.play(Indicate(cells[i][0], color=GREEN, scale_factor=1.2), run_time=1)
+                
+                ans_box = RoundedRectangle(corner_radius=0.1, width=1.4, height=0.7, color=GREEN, stroke_width=2).next_to(set_box, DOWN, buff=0.5)
+                ans_text = Text("True", font=typo.font_code(), font_size=24, color=GREEN, weight=BOLD).move_to(ans_box.get_center())
+                ans_group = VGroup(ans_box, ans_text)
+                
+                self.play(FadeIn(ans_group), run_time=0.5)
+                self.play(Indicate(ans_group, scale_factor=1.2, color=GREEN), run_time=1)
+                
                 found_duplicate = True
             else:
                 self.wait(0.3)
@@ -161,7 +169,7 @@ class WalkthroughPython(Scene):
                 if len(set_elements) == 0:
                     new_elem.move_to(set_box.get_left() + RIGHT * 0.5)
                 else:
-                    new_elem.next_to(set_elements[-1], RIGHT, buff=0.8)
+                    new_elem.next_to(set_elements[-1], RIGHT, buff=0.5)
                 
                 # Animate from array to set
                 flying_elem = Text(str(curr_val), font=typo.font_code(), font_size=24, color=WHITE).move_to(cells[i][0].get_center())
