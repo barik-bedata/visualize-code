@@ -71,29 +71,24 @@ class Optimal(Scene):
         dots = VGroup(*[Dot(point, color=YELLOW, radius=0.08) for point in points])
         
         # Trackers Box
-        tracker_box = RoundedRectangle(corner_radius=0.1, width=3.2, height=1.8, color=GRAY, stroke_width=2)
+        tracker_box = RoundedRectangle(corner_radius=0.1, width=3.2, height=1.8, color=WHITE, stroke_width=2)
         tracker_box.move_to(RIGHT * 3.5 + UP * 1)
         
-        min_price_title = Text("Min Price Seen: ", font=typo.font_ui(), font_size=16, color=GRAY)
+        min_price_title = Text("MinPrice: ", font=typo.font_ui(), font_size=16, color=WHITE)
         min_price_val = Text("∞", font=typo.font_code(), font_size=28, color=RED)
         min_group = VGroup(min_price_title, min_price_val).arrange(RIGHT, buff=0.15)
         
-        max_profit_title = Text("Max Profit: ", font=typo.font_ui(), font_size=16, color=GRAY)
+        max_profit_title = Text("MaxProfit: ", font=typo.font_ui(), font_size=16, color=WHITE)
         max_profit_val = Text("0", font=typo.font_code(), font_size=28, color=GREEN)
         max_group = VGroup(max_profit_title, max_profit_val).arrange(RIGHT, buff=0.15)
         
         trackers = VGroup(min_group, max_group).arrange(DOWN, buff=0.25, aligned_edge=LEFT)
         trackers.move_to(tracker_box.get_center())
 
-        algo_text = Text(
-            "Iterate once (O(N)).\nTrack min_price & max_profit.",
-            font=typo.font_code(), font_size=16, color=WHITE
-        ).next_to(tracker_box, DOWN, buff=0.5)
-
         self.play(
             FadeIn(cells), Create(axes), FadeIn(axes_labels), 
             Create(line_graph), FadeIn(dots),
-            FadeIn(tracker_box), FadeIn(trackers), FadeIn(algo_text),
+            FadeIn(tracker_box), FadeIn(trackers),
             run_time=1.5
         )
         self.wait(1)
