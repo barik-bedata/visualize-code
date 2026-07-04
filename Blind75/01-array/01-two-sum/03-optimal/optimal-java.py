@@ -7,7 +7,7 @@ import numpy as np
 
 config.flush_cache = True
 
-class HashMapSolution(Scene):
+class HashMapSolutionJava(Scene):
     def construct(self):
         # ১. প্রিমিয়াম ম্যাট অফ-ব্ল্যাক ব্যাকগ্রাউন্ড
         from components.typography import Typography

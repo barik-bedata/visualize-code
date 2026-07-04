@@ -71,9 +71,9 @@ class BruteForce(Scene):
         dots = VGroup(*[Dot(point, color=YELLOW, radius=0.08) for point in points])
         
         # Max Profit Tracker
-        max_profit_box = RoundedRectangle(corner_radius=0.1, width=2.5, height=1.2, color=GRAY, stroke_width=2)
+        max_profit_box = RoundedRectangle(corner_radius=0.1, width=2.5, height=1.2, color=WHITE, stroke_width=2)
         max_profit_box.move_to(RIGHT * 3.5 + UP * 1)
-        max_profit_title = Text("Max Profit", font=typo.font_ui(), font_size=20, color=GRAY).next_to(max_profit_box, UP, buff=0.1)
+        max_profit_title = Text("Max Profit", font=typo.font_ui(), font_size=20, color=WHITE).next_to(max_profit_box, UP, buff=0.1)
         max_profit_val = Text("0", font=typo.font_code(), font_size=36, color=GREEN).move_to(max_profit_box.get_center())
         
         tracker_group = VGroup(max_profit_box, max_profit_title, max_profit_val)

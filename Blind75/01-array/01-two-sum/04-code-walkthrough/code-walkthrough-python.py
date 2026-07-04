@@ -7,7 +7,7 @@ import numpy as np
 
 config.flush_cache = True
 
-class Walkthrough(Scene):
+class WalkthroughPython(Scene):
     def construct(self):
         from components.typography import Typography, ITypography
         from components.screenTemplate import ScreenTemplate, IScreenTemplate
