@@ -12,6 +12,7 @@ class Statement(Scene):
         # ১. প্রিমিয়াম ম্যাট অফ-ব্ল্যাক ব্যাকগ্রাউন্ড 
         from components.typography import Typography
         from components.screenTemplate import ScreenTemplate
+        from components.highlighter import RangeHighlighter
         
         typo = Typography()
         screen_template = ScreenTemplate(self, typo)
@@ -74,7 +75,29 @@ class Statement(Scene):
             run_time=1.5,
             rate_func=smooth
         )
-        self.wait(0.5)
+        
+        # Reusable Highlighter Component for Array & Target Box
+        hl_array = RangeHighlighter(self, BORDER_YELLOW)
+        hl_array.create(array_cells, 0, len(nums) - 1, buff=0.08, stroke_width=3)
+        
+        hl_target = RangeHighlighter(self, BORDER_YELLOW)
+        hl_target.create(VGroup(target_box), 0, 0, buff=0.08, stroke_width=3)
+        
+        # Border highlight show (line animation)
+        self.play(
+            Create(hl_array.border),
+            Create(hl_target.border),
+            run_time=0.8
+        )
+        self.wait(0.4)
+        
+        # Border highlight hide (line animation)
+        self.play(
+            Uncreate(hl_array.border),
+            Uncreate(hl_target.border),
+            run_time=0.8
+        )
+        self.wait(0.3)
 
         # ==========================================
         # ৩. SELECTION PHASE (Zero-Gap Fix - Border then Purple Fill)

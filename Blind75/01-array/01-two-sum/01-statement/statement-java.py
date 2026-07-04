@@ -75,7 +75,8 @@ class Statement(Scene):
             run_time=1.5,
             rate_func=smooth
         )
-        
+        self.wait(0.5)
+
         # Reusable Highlighter Component for Array & Target Box
         hl_array = RangeHighlighter(self, BORDER_YELLOW)
         hl_array.create(array_cells, 0, len(nums) - 1, buff=0.08, stroke_width=3)
@@ -83,19 +84,19 @@ class Statement(Scene):
         hl_target = RangeHighlighter(self, BORDER_YELLOW)
         hl_target.create(VGroup(target_box), 0, 0, buff=0.08, stroke_width=3)
         
-        # Border highlight show
+        # Border highlight show (line animation)
         self.play(
             Create(hl_array.border),
             Create(hl_target.border),
-            run_time=0.6
+            run_time=0.8
         )
         self.wait(0.4)
         
-        # Border highlight hide (fadeout)
+        # Border highlight hide (line animation)
         self.play(
-            FadeOut(hl_array.border),
-            FadeOut(hl_target.border),
-            run_time=0.6
+            Uncreate(hl_array.border),
+            Uncreate(hl_target.border),
+            run_time=0.8
         )
         self.wait(0.3)
 
