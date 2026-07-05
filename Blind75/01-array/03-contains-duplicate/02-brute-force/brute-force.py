@@ -45,7 +45,7 @@ class BruteForce(Scene):
         array_group = VGroup(nums_label, cells)
         
         # Status Text Area (for comparisons)
-        status_text = Text("Comparing elements...", font=typo.font_ui(), font_size=24, color=GRAY)
+        status_text = Text("Comparing elements...", font=typo.font_ui(), font_size=24, color="#1E1E1E")
         
         left_column = VGroup(array_group, status_text).arrange(DOWN, buff=2.0, aligned_edge=LEFT)
 

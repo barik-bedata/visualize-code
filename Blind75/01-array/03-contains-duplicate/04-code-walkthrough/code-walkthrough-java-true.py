@@ -24,7 +24,7 @@ class OptimalJava(Scene):
         BLUE = typo.color_blue()
         YELLOW = typo.color_yellow()
         
-        tracker.screen_optimal_approach("Optimal - Java (HashSet)")
+        tracker.screen_optimal_approach("Optimal Approach")
 
         # ==========================================
         # 1. LAYOUT SETUP
