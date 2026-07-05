@@ -1,7 +1,7 @@
 from manim import *
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent / "00-shared-components"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent / "00-shared-components"))
 
 
 from components.typography import Typography, ITypography
@@ -13,7 +13,7 @@ from components.arrayBuilder import ArrayBuilder, IArrayBuilder
 config.flush_cache = True
 
 
-class AlternativeWalkthrough(Scene):
+class CodeWalkthroughPython(Scene):
     def construct(self):
         typo: ITypography = Typography()
         self.camera.background_color = typo.bg()
@@ -56,30 +56,27 @@ class AlternativeWalkthrough(Scene):
         n_box.set_y(nums2.cells.get_y())
         row2.next_to(row1, DOWN, buff=1.5, aligned_edge=LEFT)
 
-        # ── Java Code ─────────────────────────────────────────────
-        java_code_string = """public void merge(int[] nums1, int m, int[] nums2, int n) {
-    int p1 = m - 1;
-    int p2 = n - 1;
-    int p = nums1.length - 1;
+        # ── Python Code ─────────────────────────────────────────────
+        python_code_string = """def merge(nums1, m, nums2, n):
+    p1 = m - 1
+    p2 = n - 1
+    p = len(nums1) - 1
 
-    while (p >= 0) {
-        int val1 = (p1 >= 0) ? nums1[p1] : Integer.MIN_VALUE;
-        int val2 = (p2 >= 0) ? nums2[p2] : Integer.MIN_VALUE;
+    while p >= 0:
+        val1 = nums1[p1] if p1 >= 0 else float('-inf')
+        val2 = nums2[p2] if p2 >= 0 else float('-inf')
 
-        if (val1 > val2) {
-            nums1[p] = val1;
-            p1--;
-        } else {
-            nums1[p] = val2;
-            p2--;
-        }
+        if val1 > val2:
+            nums1[p] = val1
+            p1 -= 1
+        else:
+            nums1[p] = val2
+            p2 -= 1
 
-        p--;
-    }
-}"""
+        p -= 1"""
         code_block = Code(
-            code_string=java_code_string,
-            language="java",
+            code_string=python_code_string,
+            language="python",
             tab_width=4,
             background="window",
             formatter_style="monokai"
@@ -109,7 +106,7 @@ class AlternativeWalkthrough(Scene):
         self.wait(0.5)
 
         # ── Setup Pointers ─────────────────────────────────────
-        # int p1 = m - 1;
+        # p1 = m - 1
         highlight_line(1)
         p1_arrow = Arrow(start=UP, end=DOWN, color=typo.color_blue(), max_tip_length_to_length_ratio=0.3, stroke_width=10).scale(0.25)
         p1_arrow.next_to(nums1.cells[2], UP, buff=0.1)
@@ -117,7 +114,7 @@ class AlternativeWalkthrough(Scene):
         p1_group = VGroup(p1_arrow, p1_text)
         self.play(FadeIn(p1_group))
 
-        # int p2 = n - 1;
+        # p2 = n - 1
         highlight_line(2)
         p2_arrow = Arrow(start=DOWN, end=UP, color=typo.color_yellow(), max_tip_length_to_length_ratio=0.3, stroke_width=10).scale(0.25)
         p2_arrow.next_to(nums2.cells[2], DOWN, buff=0.1)
@@ -125,7 +122,7 @@ class AlternativeWalkthrough(Scene):
         p2_group = VGroup(p2_arrow, p2_text)
         self.play(FadeIn(p2_group))
 
-        # int p = nums1.length - 1;
+        # p = len(nums1) - 1
         highlight_line(3)
         p_arrow = Arrow(start=DOWN, end=UP, color=typo.color_green(), max_tip_length_to_length_ratio=0.3, stroke_width=10).scale(0.25)
         p_arrow.next_to(nums1.cells[5], DOWN, buff=0.1)
@@ -142,25 +139,25 @@ class AlternativeWalkthrough(Scene):
         v1 = [1, 2, 3]
         v2 = [2, 5, 6]
 
-        # while (p >= 0)
+        # while p >= 0:
         highlight_line(5)
         
         while p_idx >= 0:
-            # int val1 = ...
+            # val1 = nums1[p1] ...
             highlight_line(6)
             val1 = v1[p1_idx] if p1_idx >= 0 else float('-inf')
             if p1_idx >= 0:
                 nums1.cells[p1_idx].set_z_index(1)
                 self.play(nums1.cells[p1_idx][0].animate.set_stroke(typo.color_blue()), run_time=0.3)
             
-            # int val2 = ...
+            # val2 = nums2[p2] ...
             highlight_line(7)
             val2 = v2[p2_idx] if p2_idx >= 0 else float('-inf')
             if p2_idx >= 0:
                 nums2.cells[p2_idx].set_z_index(1)
                 self.play(nums2.cells[p2_idx][0].animate.set_stroke(typo.color_yellow()), run_time=0.3)
 
-            # if (val1 > val2)  →  line 9
+            # if val1 > val2:
             highlight_line(9)
             self.wait(0.5)
 
@@ -171,7 +168,7 @@ class AlternativeWalkthrough(Scene):
             cmp_p2_idx = p2_idx
             
             if takeFromNums1:
-                # nums1[p] = val1;  →  line 10
+                # nums1[p] = val1
                 highlight_line(10)
                 source_cell = nums1.cells[p1_idx]
                 target_cell = nums1.cells[p_idx]
@@ -195,7 +192,7 @@ class AlternativeWalkthrough(Scene):
                     run_time=0.2
                 )
 
-                # p1--;  →  line 11
+                # p1 -= 1
                 highlight_line(11)
                 p1_idx -= 1
                 if p1_idx >= 0:
@@ -210,10 +207,10 @@ class AlternativeWalkthrough(Scene):
                         run_time=0.5
                     )
             else:
-                # } else {  →  line 12
+                # else:
                 highlight_line(12)
                 
-                # nums1[p] = val2;  →  line 13
+                # nums1[p] = val2
                 highlight_line(13)
                 source_cell = nums2.cells[p2_idx]
                 target_cell = nums1.cells[p_idx]
@@ -236,7 +233,7 @@ class AlternativeWalkthrough(Scene):
                     run_time=0.2
                 )
 
-                # p2--;  →  line 14
+                # p2 -= 1
                 highlight_line(14)
                 p2_idx -= 1
                 if p2_idx >= 0:
@@ -260,8 +257,8 @@ class AlternativeWalkthrough(Scene):
             if clean:
                 self.play(*clean, run_time=0.15)
 
-            # p--;  →  line 17
-            highlight_line(17)          # highlight p--
+            # p -= 1
+            highlight_line(16)          # highlight p -= 1
             p_idx -= 1
             if p_idx >= 0:
                 self.play(
@@ -273,7 +270,7 @@ class AlternativeWalkthrough(Scene):
                 target_x = nums1.cells[0].get_left()[0] - 1.2
                 self.play(p_group.animate.set_x(target_x), run_time=0.4)
 
-            # Jump straight back to while condition — no closing-brace highlight
+            # Jump straight back to while condition
             if p_idx >= 0:
                 highlight_line(5)
 
