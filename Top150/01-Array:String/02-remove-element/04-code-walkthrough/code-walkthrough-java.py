@@ -19,7 +19,7 @@ class CodeWalkthroughJava(Scene):
         tracker.screen_code_walkthrough("Code Walkthrough")
 
         # ── nums ───────────────────────────────────────────────────
-        vals = [3, 2, 2, 3]
+        vals = [1, 1, 2]
         nums = ArrayBuilder(
             scene=self,
             typo=typo,
@@ -29,22 +29,16 @@ class CodeWalkthroughJava(Scene):
         cells = nums.cells
         nums_group = nums.group
         
-        # ── val ───────────────────────────────────────────────────
-        val_rect = Rectangle(width=1.4, height=0.8, color=typo.color_yellow(), stroke_width=0)
-        val_text = Text("val = 3", font=typo.font_code(), font_size=20, color=typo.color_yellow())
-        val_text.move_to(val_rect.get_center())
-        val_box = VGroup(val_rect, val_text)
-        
-        row1 = VGroup(nums_group, val_box).arrange(RIGHT, buff=0.8, aligned_edge=UP).scale(0.7)
+        row1 = nums_group.scale(0.8)
         row1.move_to(UP * 1.5 + LEFT * 3.0)
 
         # ── Java Code ─────────────────────────────────────────────
         java_code_string = """class Solution {
-    public int removeElement(int[] nums, int val) {
-        int writeIdx = 0;
+    public int removeDuplicates(int[] nums) {
+        int writeIdx = 1;
         
-        for (int readIdx = 0; readIdx < nums.length; readIdx++) {
-            if (nums[readIdx] != val) {
+        for (int readIdx = 1; readIdx < nums.length; readIdx++) {
+            if (nums[readIdx] != nums[readIdx - 1]) {
                 nums[writeIdx] = nums[readIdx];
                 writeIdx++;
             }
@@ -81,39 +75,39 @@ class CodeWalkthroughJava(Scene):
         self.play(Create(h_rect))
         self.wait(0.5)
         
-        # Line 2: int writeIdx = 0;
+        # Line 2: int writeIdx = 1;
         self.play(highlight_line(2))
         
-        write_arrow = Arrow(start=DOWN, end=UP, color=typo.color_green(), max_tip_length_to_length_ratio=0.3, stroke_width=12).scale(0.33 * 0.7)
-        write_arrow.next_to(cells[0], DOWN, buff=0.1)
-        write_text = Text("w", font=typo.font_code(), font_size=20 * 0.7, weight=BOLD, color=typo.color_green()).next_to(write_arrow, DOWN, buff=0.1)
+        write_arrow = Arrow(start=DOWN, end=UP, color=typo.color_green(), max_tip_length_to_length_ratio=0.3, stroke_width=12).scale(0.33 * 0.8)
+        write_arrow.next_to(cells[1], DOWN, buff=0.1)
+        write_text = Text("w", font=typo.font_code(), font_size=20 * 0.8, weight=BOLD, color=typo.color_green()).next_to(write_arrow, DOWN, buff=0.1)
         write_group = VGroup(write_arrow, write_text)
         self.play(FadeIn(write_group))
         
-        read_arrow = Arrow(start=UP, end=DOWN, color=typo.color_blue(), max_tip_length_to_length_ratio=0.3, stroke_width=12).scale(0.33 * 0.7)
-        read_arrow.next_to(cells[0], UP, buff=0.1)
-        read_text = Text("r", font=typo.font_code(), font_size=20 * 0.7, weight=BOLD, color=typo.color_blue()).next_to(read_arrow, UP, buff=0.1)
+        read_arrow = Arrow(start=UP, end=DOWN, color=typo.color_blue(), max_tip_length_to_length_ratio=0.3, stroke_width=12).scale(0.33 * 0.8)
+        read_arrow.next_to(cells[1], UP, buff=0.1)
+        read_text = Text("r", font=typo.font_code(), font_size=20 * 0.8, weight=BOLD, color=typo.color_blue()).next_to(read_arrow, UP, buff=0.1)
         read_group = VGroup(read_arrow, read_text)
         
-        write_idx = 0
-        for read_idx in range(len(vals)):
+        write_idx = 1
+        for read_idx in range(1, len(vals)):
             # Line 4: for (...)
             self.play(highlight_line(4))
-            if read_idx == 0:
+            if read_idx == 1:
                 self.play(FadeIn(read_group))
             else:
                 self.play(read_group.animate.next_to(cells[read_idx], UP, buff=0.1), run_time=0.5)
             self.wait(0.3)
             
-            # Line 5: if (nums[readIdx] != val)
+            # Line 5: if (nums[readIdx] != nums[readIdx - 1])
             self.play(highlight_line(5))
             
             cell_highlighter = RangeHighlighter(self, typo.color_blue())
-            cell_highlighter.create(cells, read_idx, read_idx)
+            cell_highlighter.create(cells, read_idx - 1, read_idx)
             cell_highlighter.effect_highlight_show()
             self.wait(0.3)
             
-            if vals[read_idx] != 3:
+            if vals[read_idx] != vals[read_idx - 1]:
                 # Line 6: nums[writeIdx] = nums[readIdx];
                 self.play(highlight_line(6))
                 if read_idx != write_idx:
@@ -128,6 +122,7 @@ class CodeWalkthroughJava(Scene):
                     )
                     self.play(FadeOut(ghost), run_time=0.1)
                     nums.set_value(write_idx, vals[read_idx], run_time=0.2)
+                    vals[write_idx] = vals[read_idx]
                 else:
                     self.play(Indicate(cells[read_idx][1], color=typo.color_green()), run_time=0.5)
 
@@ -150,11 +145,11 @@ class CodeWalkthroughJava(Scene):
         self.play(FadeOut(read_group), FadeOut(write_group))
         
         # Dim the rest
-        self.play(
-            cells[2][1].animate.set_opacity(0.3),
-            cells[3][1].animate.set_opacity(0.3),
-            run_time=0.5
-        )
+        if write_idx < len(vals):
+            self.play(
+                *[cells[j][1].animate.set_opacity(0.3) for j in range(write_idx, len(vals))],
+                run_time=0.5
+            )
 
         self.wait(1.5)
         self.play(FadeOut(h_rect))

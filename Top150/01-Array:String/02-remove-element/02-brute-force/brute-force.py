@@ -23,7 +23,7 @@ class BruteForce(Scene):
         # ─────────────────────────────────────────────────────────────
         #  BUILD nums ROW
         # ─────────────────────────────────────────────────────────────
-        vals = [3, 2, 2, 3]
+        vals = [1, 1, 2, 2, 3]
         nums = ArrayBuilder(
             scene=self,
             typo=typo,
@@ -33,13 +33,7 @@ class BruteForce(Scene):
         cells = nums.cells
         nums_group = nums.group
         
-        # ── val ───────────────────────────────────────────────────
-        val_rect = Rectangle(width=1.4, height=0.8, color=typo.color_yellow(), stroke_width=0)
-        val_text = Text("val = 3", font=typo.font_code(), font_size=20, color=typo.color_yellow())
-        val_text.move_to(val_rect.get_center())
-        val_box = VGroup(val_rect, val_text)
-        
-        row1 = VGroup(nums_group, val_box).arrange(RIGHT, buff=0.8, aligned_edge=UP)
+        row1 = nums_group
         row1.move_to(UP * 1.5)
 
         # ─────────────────────────────────────────────────────────────
@@ -48,7 +42,7 @@ class BruteForce(Scene):
         temp = ArrayBuilder(
             scene=self,
             typo=typo,
-            values=["", "", "", ""],
+            values=["", "", "", "", ""],
             label="temp =",
         ).build()
         temp_cells = temp.cells
@@ -83,23 +77,23 @@ class BruteForce(Scene):
         #  STEP PANEL  — aligned to nums top border, right side
         # ─────────────────────────────────────────────────────────────
         panel = StepPanel(scene=self, typo=typo, steps=[
-            "Create a temp array.",
-            "Iterate nums. If element != val,",
-            "add it to temp array.",
-            "Copy temp back to nums."
+            ("Create a temp array.", ""),
+            ("Iterate nums. If element != last added,", ""),
+            ("add it to temp array.", ""),
+            ("Copy temp back to nums.", "")
         ])
-        panel.group.next_to(content, RIGHT, buff=1.0).align_to(content, UP)
+        panel._group.next_to(content, RIGHT, buff=1.0).align_to(content, UP)
         panel.show()
 
         # Step 1: Create a temp array
-        panel.highlight_step(0)
+        panel.activate(0)
         self.play(FadeIn(row2, shift=UP * 0.3), run_time=1.0)
         self.wait(1.0)
 
         # Step 2 & 3: Iterate and copy
-        panel.highlight_step(1)
+        panel.activate(1)
         self.wait(0.5)
-        panel.highlight_step(2)
+        panel.activate(2)
         
         # Pointers
         i_arrow = Arrow(start=UP, end=DOWN, color=typo.color_blue(), max_tip_length_to_length_ratio=0.3, stroke_width=12).scale(0.33)
@@ -110,6 +104,7 @@ class BruteForce(Scene):
         self.play(FadeIn(i_group))
         
         temp_idx = 0
+        last_added = None
         for i in range(len(vals)):
             if i > 0:
                 self.play(i_group.animate.next_to(cells[i], UP, buff=0.1), run_time=0.5)
@@ -120,7 +115,7 @@ class BruteForce(Scene):
             cell_highlighter.effect_highlight_show()
             self.wait(0.5)
             
-            if vals[i] != 3:
+            if last_added is None or vals[i] != last_added:
                 # Copy to temp
                 ghost = cells[i][1].copy()
                 self.add(ghost)
@@ -134,6 +129,7 @@ class BruteForce(Scene):
                 self.play(FadeOut(ghost), run_time=0.1)
                 temp.set_value(temp_idx, vals[i], run_time=0.2)
                 
+                last_added = vals[i]
                 temp_idx += 1
             else:
                 # Show rejection or skip
@@ -146,7 +142,7 @@ class BruteForce(Scene):
         self.play(FadeOut(i_group))
 
         # Step 4: Copy temp back to nums
-        panel.highlight_step(3)
+        panel.activate(3)
         
         source_h = RangeHighlighter(self, typo.color_blue())
         source_h.create(temp_cells, 0, temp_idx - 1)
@@ -168,17 +164,17 @@ class BruteForce(Scene):
                 run_time=0.5
             )
             self.play(FadeOut(ghost), run_time=0.1)
-            nums.set_value(i, vals[i] if vals[i] != 3 else 2, run_time=0.2)
+            nums.set_value(i, vals[i], run_time=0.2)
         
         source_h.effect_highlight_hide()
         target_h.effect_highlight_hide()
 
         # Dim the rest
-        self.play(
-            cells[2][1].animate.set_opacity(0.3),
-            cells[3][1].animate.set_opacity(0.3),
-            run_time=0.5
-        )
+        if temp_idx < len(vals):
+            self.play(
+                *[cells[j][1].animate.set_opacity(0.3) for j in range(temp_idx, len(vals))],
+                run_time=0.5
+            )
 
         self.wait(1.5)
         panel.hide()

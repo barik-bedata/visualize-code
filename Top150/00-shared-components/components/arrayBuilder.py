@@ -100,15 +100,11 @@ class ArrayBuilder(IArrayBuilder):
         for v in self._values:
             square = Square(
                 side_length=self._cell_size,
-                color=self._typo.color_gray(),
+                color=self._typo.color_white(),
                 stroke_width=2,
             )
-            # ০ হলে dim রঙ, নইলে সাদা
-            text_color = (
-                self._typo.color_secondary()
-                if (self._zero_dim and v == 0)
-                else self._typo.color_white()
-            )
+            # Text is always white
+            text_color = self._typo.color_white()
             number = Text(
                 str(v),
                 font=self._typo.font_code(),
