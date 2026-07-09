@@ -7,7 +7,7 @@ import numpy as np
 
 config.flush_cache = True
 
-class BruteForce(Scene):
+class OptimalPython(Scene):
     def construct(self):
         from components.typography import Typography, ITypography
         from components.screenTemplate import ScreenTemplate, IScreenTemplate
@@ -24,7 +24,7 @@ class BruteForce(Scene):
         BLUE = typo.color_blue()
         YELLOW = typo.color_yellow()
         
-        tracker.screen_brute_force("Brute Force")
+        tracker.screen_optimal_approach("Optimal Approach (Prefix/Suffix Products)")
 
         # ==========================================
         # 1. LAYOUT SETUP (Left Side)
@@ -44,7 +44,6 @@ class BruteForce(Scene):
         nums_label.match_y(cells[0][0])
         array_group = VGroup(nums_label, cells)
         
-        # Answer array
         ans_array = [1, 1, 1, 1]
         ans_cells = VGroup()
         for idx, val in enumerate(ans_array):
@@ -66,17 +65,15 @@ class BruteForce(Scene):
         # ==========================================
         algo_title = Text("Algorithm:", font=typo.font_ui(), font_size=28, color=YELLOW, weight=BOLD)
         algo_lines = VGroup(
-            Text("* for each element i in nums", font=typo.font_code(), font_size=24, color=WHITE),
-            Text("*     product = 1", font=typo.font_code(), font_size=24, color=WHITE),
-            Text("*     for each element j in nums", font=typo.font_code(), font_size=24, color=WHITE),
-            Text("*         if i != j", font=typo.font_code(), font_size=24, color=WHITE),
-            Text("*             product *= nums[j]", font=typo.font_code(), font_size=24, color=WHITE),
-            Text("*     answer[i] = product", font=typo.font_code(), font_size=24, color=WHITE)
+            Text("1. Initialize answer array", font=typo.font_code(), font_size=24, color=WHITE),
+            Text("2. Left pass:", font=typo.font_code(), font_size=24, color=WHITE),
+            Text("   Compute prefix products", font=typo.font_code(), font_size=24, color=WHITE),
+            Text("3. Right pass:", font=typo.font_code(), font_size=24, color=WHITE),
+            Text("   Compute suffix products", font=typo.font_code(), font_size=24, color=WHITE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.4)
         algo_lines.next_to(algo_title, DOWN, buff=0.5, aligned_edge=LEFT)
         algo_group = VGroup(algo_title, algo_lines)
 
-        # Main Layout Arrangement
         main_layout = VGroup(left_column, algo_group).arrange(RIGHT, buff=1.5)
         main_layout.scale_to_fit_width(12.0)
         main_layout.move_to(ORIGIN)
@@ -95,65 +92,51 @@ class BruteForce(Scene):
         i_arrow = Triangle(color=BLUE).scale(0.12).set_fill(BLUE, opacity=1)
         i_label = Text("i", font=typo.font_code(), font_size=16, color=BLUE).next_to(i_arrow, DOWN, buff=0.1)
         i_ptr = VGroup(i_arrow, i_label)
-        
-        j_arrow = Triangle(color=RED).scale(0.12).set_fill(RED, opacity=1).rotate(PI)
-        j_label = Text("j", font=typo.font_code(), font_size=16, color=RED).next_to(j_arrow, UP, buff=0.1)
-        j_ptr = VGroup(j_arrow, j_label)
+
+        # Prefix Pass
+        prefix = 1
+        prefix_text = Text(f"prefix = {prefix}", font=typo.font_code(), font_size=24, color=BLUE).next_to(ans_group, UP, buff=0.5)
+        self.play(FadeIn(prefix_text), run_time=0.5)
 
         for i in range(len(nums_array)):
             if i == 0:
-                i_ptr.next_to(cells[i][0], DOWN, buff=0.2)
-                self.play(FadeIn(i_ptr), cells[i][0].animate.set_fill(BLUE, opacity=0.3), run_time=0.3)
+                i_ptr.next_to(ans_cells[i][0], DOWN, buff=0.5)
+                self.play(FadeIn(i_ptr), run_time=0.3)
             else:
-                self.play(
-                    i_ptr.animate.next_to(cells[i][0], DOWN, buff=0.2),
-                    cells[i-1][0].animate.set_fill(opacity=0),
-                    cells[i][0].animate.set_fill(BLUE, opacity=0.3),
-                    run_time=0.3
-                )
+                self.play(i_ptr.animate.next_to(ans_cells[i][0], DOWN, buff=0.5), run_time=0.3)
             
-            product = 1
-            prod_text = Text(f"prod = {product}", font=typo.font_code(), font_size=24, color=WHITE).next_to(cells, UP, buff=1)
-            self.play(FadeIn(prod_text), run_time=0.3)
+            ans_val = Text(str(prefix), font=typo.font_code(), font_size=24, color=GREEN).move_to(ans_cells[i][0].get_center())
+            ans_cells[i].replace_submobject(1, ans_val)
+            self.play(FadeIn(ans_val), ans_cells[i][0].animate.set_fill(GREEN, opacity=0.3), run_time=0.3)
             
-            for j in range(len(nums_array)):
-                if j == 0:
-                    j_ptr.next_to(cells[j][0], UP, buff=0.5)
-                    if 'j_ptr' not in self.mobjects:
-                        self.play(FadeIn(j_ptr), run_time=0.3)
-                    else:
-                        self.play(j_ptr.animate.next_to(cells[j][0], UP, buff=0.5), run_time=0.3)
-                else:
-                    self.play(
-                        j_ptr.animate.next_to(cells[j][0], UP, buff=0.5),
-                        run_time=0.3
-                    )
-                
-                cells[j][0].set_stroke(RED, width=4)
-                self.wait(0.2)
-                
-                if i != j:
-                    product *= nums_array[j]
-                    new_prod_text = Text(f"prod = {product}", font=typo.font_code(), font_size=24, color=GREEN).next_to(cells, UP, buff=1)
-                    self.play(Transform(prod_text, new_prod_text), run_time=0.3)
-                else:
-                    cross = Cross(cells[j][0], stroke_color=RED)
-                    self.play(Create(cross), run_time=0.3)
-                    self.play(FadeOut(cross), run_time=0.3)
-                
-                cells[j][0].set_stroke(WHITE, width=2)
+            prefix *= nums_array[i]
+            new_prefix_text = Text(f"prefix = {prefix}", font=typo.font_code(), font_size=24, color=BLUE).next_to(ans_group, UP, buff=0.5)
+            self.play(Transform(prefix_text, new_prefix_text), run_time=0.3)
+
+        self.play(FadeOut(prefix_text), run_time=0.5)
+
+        # Postfix Pass
+        postfix = 1
+        postfix_text = Text(f"postfix = {postfix}", font=typo.font_code(), font_size=24, color=RED).next_to(ans_group, DOWN, buff=1.0)
+        self.play(FadeIn(postfix_text), run_time=0.5)
+
+        for i in range(len(nums_array)-1, -1, -1):
+            self.play(i_ptr.animate.next_to(ans_cells[i][0], DOWN, buff=0.5), run_time=0.3)
             
-            # Update ans array
-            ans_val = Text(str(product), font=typo.font_code(), font_size=24, color=GREEN).move_to(ans_cells[i][0].get_center())
-            ans_cells[i].remove(ans_cells[i][1])
-            ans_cells[i].add(ans_val)
-            self.play(FadeIn(ans_val), ans_cells[i][0].animate.set_fill(GREEN, opacity=0.3), run_time=0.5)
-            self.play(FadeOut(prod_text), run_time=0.3)
+            curr_val = int(ans_cells[i][1].text) if ans_cells[i][1].text else 1
+            new_val = curr_val * postfix
+            
+            new_ans_val = Text(str(new_val), font=typo.font_code(), font_size=24, color=GREEN).move_to(ans_cells[i][0].get_center())
+            self.play(Transform(ans_cells[i][1], new_ans_val), run_time=0.3)
+            
+            postfix *= nums_array[i]
+            new_postfix_text = Text(f"postfix = {postfix}", font=typo.font_code(), font_size=24, color=RED).next_to(ans_group, DOWN, buff=1.0)
+            self.play(Transform(postfix_text, new_postfix_text), run_time=0.3)
+
+        self.play(FadeOut(postfix_text), FadeOut(i_ptr), run_time=0.5)
         
-        self.play(FadeOut(i_ptr), FadeOut(j_ptr), cells[-1][0].animate.set_fill(opacity=0), run_time=0.5)
-                
         # --- lower third ---
-        tracker.show_lower_third("Complexity Analysis", "Time: O(N²), Space: O(1) (excluding output array)", color_type="red", position="right")
+        tracker.show_lower_third("Complexity Analysis", "Time: O(N), Space: O(1) (excluding output array)", color_type="green", position="right")
         self.wait(3)
 
 if __name__ == "__main__":
@@ -161,5 +144,5 @@ if __name__ == "__main__":
     config.pixel_height = 1080
     config.pixel_width = 1920
     config.frame_rate = 60
-    scene = BruteForce()
+    scene = OptimalPython()
     scene.render()
