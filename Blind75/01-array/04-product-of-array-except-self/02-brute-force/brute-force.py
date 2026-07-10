@@ -50,7 +50,7 @@ class BruteForce(Scene):
         for idx, val in enumerate(ans_array):
             cell_bg = Square(side_length=0.7, color=WHITE, stroke_width=2)
             cell_val = Text("", font=typo.font_code(), font_size=24, color=WHITE)
-            cell_idx = Text(str(idx), font=typo.font_code(), font_size=20, color="#B3B3B3").next_to(cell_bg, DOWN, buff=0.1)
+            cell_idx = Text(str(idx), font=typo.font_code(), font_size=20, color="#B3B3B3").next_to(cell_bg, UP, buff=0.1)
             cell = VGroup(cell_bg, cell_val, cell_idx)
             ans_cells.add(cell)
             
@@ -113,7 +113,7 @@ class BruteForce(Scene):
                 )
             
             product = 1
-            prod_text = Text(f"prod = {product}", font=typo.font_code(), font_size=24, color=WHITE).next_to(cells, UP, buff=1)
+            prod_text = Text(f"product = {product}", font=typo.font_code(), font_size=24, color=WHITE).next_to(cells, DOWN, buff=1)
             self.play(FadeIn(prod_text), run_time=0.3)
             
             for j in range(len(nums_array)):
@@ -129,12 +129,13 @@ class BruteForce(Scene):
                         run_time=0.3
                     )
                 
+                cells[j][0].set_z_index(1)
                 cells[j][0].set_stroke(RED, width=4)
                 self.wait(0.2)
                 
                 if i != j:
                     product *= nums_array[j]
-                    new_prod_text = Text(f"prod = {product}", font=typo.font_code(), font_size=24, color=GREEN).next_to(cells, UP, buff=1)
+                    new_prod_text = Text(f"product = {product}", font=typo.font_code(), font_size=24, color=GREEN).next_to(cells, DOWN, buff=1)
                     self.play(Transform(prod_text, new_prod_text), run_time=0.3)
                 else:
                     cross = Cross(cells[j][0], stroke_color=RED)
@@ -142,18 +143,25 @@ class BruteForce(Scene):
                     self.play(FadeOut(cross), run_time=0.3)
                 
                 cells[j][0].set_stroke(WHITE, width=2)
+                cells[j][0].set_z_index(0)
             
             # Update ans array
             ans_val = Text(str(product), font=typo.font_code(), font_size=24, color=GREEN).move_to(ans_cells[i][0].get_center())
             ans_cells[i].remove(ans_cells[i][1])
+            
+            prod_copy = prod_text.copy()
+            self.play(
+                ReplacementTransform(prod_copy, ans_val),
+                ans_cells[i][0].animate.set_fill(GREEN, opacity=0.3),
+                run_time=0.5
+            )
             ans_cells[i].add(ans_val)
-            self.play(FadeIn(ans_val), ans_cells[i][0].animate.set_fill(GREEN, opacity=0.3), run_time=0.5)
             self.play(FadeOut(prod_text), run_time=0.3)
         
         self.play(FadeOut(i_ptr), FadeOut(j_ptr), cells[-1][0].animate.set_fill(opacity=0), run_time=0.5)
                 
         # --- lower third ---
-        tracker.show_lower_third("Complexity Analysis", "Time: O(N²), Space: O(1) (excluding output array)", color_type="red", position="right")
+        tracker.show_lower_third("Complexity Analysis", "Time: O(N²), Space: O(1)", color_type="red", position="right")
         self.wait(3)
 
 if __name__ == "__main__":
