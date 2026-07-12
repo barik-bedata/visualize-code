@@ -145,7 +145,7 @@ class OptimalJavaPart2(Scene):
                 Text(str(new_val), font=typo.font_code(), font_size=24, color=GREEN)
             ).arrange(RIGHT, buff=0.2)
             calc_group.set_y(mid_y)
-            calc_group.align_to(cells[0][0], LEFT)
+            calc_group.align_to(nums_label, LEFT)
             
             self.play(FadeIn(calc_group[0]), run_time=0.3)
             
@@ -192,34 +192,36 @@ class OptimalJavaPart2(Scene):
         self.wait(5)
 
         # Postfix Pass
-        postfix = 1
-        postfix_label = Text("postfixProd = ", font=typo.font_code(), font_size=24, color=RED)
-        postfix_val = Text(str(postfix), font=typo.font_code(), font_size=24, color=RED)
-        postfix_text = VGroup(postfix_label, postfix_val).arrange(RIGHT, buff=0.1).next_to(ans_group, DOWN, buff=1.0)
-        self.play(FadeIn(postfix_text), run_time=0.5)
+        suffix_prod = 1
+        suffix_label = Text("suffixProd = ", font=typo.font_code(), font_size=24, color=RED)
+        suffix_val = Text(str(suffix_prod), font=typo.font_code(), font_size=24, color=RED)
+        suffix_text = VGroup(suffix_label, suffix_val).arrange(RIGHT, buff=0.1)
+        suffix_text.next_to(ans_group, DOWN, buff=1.0)
+        suffix_text.align_to(ans_group, LEFT)
+        self.play(FadeIn(suffix_text), run_time=0.5)
 
         for i in range(len(nums_array)-1, -1, -1):
             self.play(i_ptr.animate.next_to(ans_cells[i][0], DOWN, buff=0.2), run_time=0.3)
             
             mid_y = (cells[0][0].get_y() + ans_cells[0][0].get_y()) / 2 + 0.3
 
-            # 1. Update postfixProd variable if i < len(nums_array) - 1
+            # 1. Update suffixProd variable if i < len(nums_array) - 1
             if i < len(nums_array) - 1:
                 cells[i+1][0].set_z_index(1)
                 self.play(cells[i+1][0].animate.set_stroke(YELLOW, width=4), run_time=0.3)
 
                 calc = VGroup(
-                    Text("postfixProd =", font=typo.font_code(), font_size=20, color=WHITE),
-                    Text(str(postfix), font=typo.font_code(), font_size=24, color=RED),
+                    Text("suffixProd =", font=typo.font_code(), font_size=20, color=WHITE),
+                    Text(str(suffix_prod), font=typo.font_code(), font_size=24, color=RED),
                     Text("×", font=typo.font_code(), font_size=24, color=WHITE),
                     Text(str(nums_array[i+1]), font=typo.font_code(), font_size=24, color=WHITE),
                     Text("=", font=typo.font_code(), font_size=24, color=WHITE),
-                    Text(str(postfix * nums_array[i+1]), font=typo.font_code(), font_size=24, color=RED)
+                    Text(str(suffix_prod * nums_array[i+1]), font=typo.font_code(), font_size=24, color=RED)
                 ).arrange(RIGHT, buff=0.2)
                 calc.set_y(mid_y)
-                calc.align_to(cells[0][0], LEFT)
+                calc.align_to(nums_label, LEFT)
 
-                copy_post = postfix_text[1].copy()
+                copy_post = suffix_text[1].copy()
                 copy_num = cells[i+1][1].copy()
 
                 self.play(
@@ -231,41 +233,41 @@ class OptimalJavaPart2(Scene):
                 self.play(FadeIn(calc[2]), FadeIn(calc[4]), FadeIn(calc[5]), run_time=0.3)
                 self.wait(0.2)
 
-                postfix *= nums_array[i+1]
-                new_postfix_val = Text(str(postfix), font=typo.font_code(), font_size=24, color=RED).next_to(postfix_text[0], RIGHT, buff=0.1)
+                suffix_prod *= nums_array[i+1]
+                new_suffix_val = Text(str(suffix_prod), font=typo.font_code(), font_size=24, color=RED).next_to(suffix_text[0], RIGHT, buff=0.1)
 
-                fade_outs = [FadeOut(calc[0]), FadeOut(calc[1]), FadeOut(calc[2]), FadeOut(calc[3]), FadeOut(calc[4]), FadeOut(copy_post), FadeOut(copy_num), FadeOut(postfix_text[1])]
+                fade_outs = [FadeOut(calc[0]), FadeOut(calc[1]), FadeOut(calc[2]), FadeOut(calc[3]), FadeOut(calc[4]), FadeOut(copy_post), FadeOut(copy_num), FadeOut(suffix_text[1])]
                 self.play(
-                    ReplacementTransform(calc[5], new_postfix_val),
+                    ReplacementTransform(calc[5], new_suffix_val),
                     *fade_outs,
                     run_time=0.5
                 )
-                postfix_text.remove(postfix_text[1])
-                postfix_text.add(new_postfix_val)
+                suffix_text.remove(suffix_text[1])
+                suffix_text.add(new_suffix_val)
                 self.play(cells[i+1][0].animate.set_stroke(WHITE, width=2), run_time=0.2)
                 cells[i+1][0].set_z_index(0)
 
-            # 2. Update ans[i] *= postfix
+            # 2. Update ans[i] *= suffixProd
             ans_cells[i][0].set_z_index(1)
             self.play(ans_cells[i][0].animate.set_stroke(BLUE, width=4), run_time=0.3)
 
             curr_val = ans_vals_array[i]
-            new_val = curr_val * postfix
+            new_val = curr_val * suffix_prod
             ans_vals_array[i] = new_val
 
             calc = VGroup(
                 Text("ans[i] =", font=typo.font_code(), font_size=20, color=WHITE),
                 Text(str(curr_val), font=typo.font_code(), font_size=24, color=GREEN),
                 Text("×", font=typo.font_code(), font_size=24, color=WHITE),
-                Text(str(postfix), font=typo.font_code(), font_size=24, color=RED),
+                Text(str(suffix_prod), font=typo.font_code(), font_size=24, color=RED),
                 Text("=", font=typo.font_code(), font_size=24, color=WHITE),
                 Text(str(new_val), font=typo.font_code(), font_size=24, color=GREEN)
             ).arrange(RIGHT, buff=0.2)
             calc.set_y(mid_y)
-            calc.align_to(cells[0][0], LEFT)
+            calc.align_to(nums_label, LEFT)
 
             copy_ans = ans_cells[i][1].copy()
-            copy_post = postfix_text[1].copy()
+            copy_post = suffix_text[1].copy()
 
             self.play(
                 FadeIn(calc[0]),
@@ -289,7 +291,7 @@ class OptimalJavaPart2(Scene):
             self.play(ans_cells[i][0].animate.set_stroke(WHITE, width=2), run_time=0.2)
             ans_cells[i][0].set_z_index(0)
 
-        self.play(FadeOut(postfix_text), FadeOut(i_ptr), run_time=0.5)
+        self.play(FadeOut(suffix_text), FadeOut(i_ptr), run_time=0.5)
         
         # --- lower third ---
         tracker.show_lower_third("Complexity Analysis", "Time: O(N), Space: O(1)", color_type="green", position="left")
