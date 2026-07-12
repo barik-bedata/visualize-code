@@ -150,7 +150,7 @@ class WalkthroughPython(Scene):
             # Line 8: ans[i] = prefix
             self.play(highlight_line(8), run_time=0.3)
             ans_val = Text(str(prefix), font=typo.font_code(), font_size=24, color=GREEN).move_to(ans_cells[i][0].get_center())
-            ans_cells[i].replace_submobject(1, ans_val)
+            ans_cells[i].submobjects[1] = ans_val
             self.play(ans_cells[i][0].animate.set_fill(GREEN, opacity=0.3), run_time=0.3)
             
             # Line 9: prefix *= nums[i]

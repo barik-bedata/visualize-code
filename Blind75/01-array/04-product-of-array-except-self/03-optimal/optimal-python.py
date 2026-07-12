@@ -106,7 +106,7 @@ class OptimalPython(Scene):
                 self.play(i_ptr.animate.next_to(ans_cells[i][0], DOWN, buff=0.5), run_time=0.3)
             
             ans_val = Text(str(prefix), font=typo.font_code(), font_size=24, color=GREEN).move_to(ans_cells[i][0].get_center())
-            ans_cells[i].replace_submobject(1, ans_val)
+            ans_cells[i].submobjects[1] = ans_val
             self.play(FadeIn(ans_val), ans_cells[i][0].animate.set_fill(GREEN, opacity=0.3), run_time=0.3)
             
             prefix *= nums_array[i]
