@@ -88,9 +88,9 @@ class BruteForce(Scene):
             FadeIn(array_group),
             FadeIn(ans_group),
             FadeIn(algo_group),
-            run_time=2
+            run_time=4
         )
-        self.wait(1)
+        self.wait(2)
 
         i_arrow = Triangle(color=BLUE).scale(0.12).set_fill(BLUE, opacity=1)
         i_label = Text("i", font=typo.font_code(), font_size=16, color=BLUE).next_to(i_arrow, DOWN, buff=0.1)
@@ -103,44 +103,44 @@ class BruteForce(Scene):
         for i in range(len(nums_array)):
             if i == 0:
                 i_ptr.next_to(cells[i][0], DOWN, buff=0.2)
-                self.play(FadeIn(i_ptr), cells[i][0].animate.set_fill(BLUE, opacity=0.3), run_time=0.3)
+                self.play(FadeIn(i_ptr), cells[i][0].animate.set_fill(BLUE, opacity=0.3), run_time=0.6)
             else:
                 self.play(
                     i_ptr.animate.next_to(cells[i][0], DOWN, buff=0.2),
                     cells[i-1][0].animate.set_fill(opacity=0),
                     cells[i][0].animate.set_fill(BLUE, opacity=0.3),
-                    run_time=0.3
+                    run_time=0.6
                 )
             
             product = 1
             prod_text = Text(f"product = {product}", font=typo.font_code(), font_size=24, color=WHITE).next_to(cells, DOWN, buff=1)
-            self.play(FadeIn(prod_text), run_time=0.3)
+            self.play(FadeIn(prod_text), run_time=0.6)
             
             for j in range(len(nums_array)):
                 if j == 0:
                     j_ptr.next_to(cells[j][0], UP, buff=0.5)
                     if 'j_ptr' not in self.mobjects:
-                        self.play(FadeIn(j_ptr), run_time=0.3)
+                        self.play(FadeIn(j_ptr), run_time=0.6)
                     else:
-                        self.play(j_ptr.animate.next_to(cells[j][0], UP, buff=0.5), run_time=0.3)
+                        self.play(j_ptr.animate.next_to(cells[j][0], UP, buff=0.5), run_time=0.6)
                 else:
                     self.play(
                         j_ptr.animate.next_to(cells[j][0], UP, buff=0.5),
-                        run_time=0.3
+                        run_time=0.6
                     )
                 
                 cells[j][0].set_z_index(1)
                 cells[j][0].set_stroke(RED, width=4)
-                self.wait(0.2)
+                self.wait(0.4)
                 
                 if i != j:
                     product *= nums_array[j]
                     new_prod_text = Text(f"product = {product}", font=typo.font_code(), font_size=24, color=GREEN).next_to(cells, DOWN, buff=1)
-                    self.play(Transform(prod_text, new_prod_text), run_time=0.3)
+                    self.play(Transform(prod_text, new_prod_text), run_time=0.6)
                 else:
                     cross = Cross(cells[j][0], stroke_color=RED)
-                    self.play(Create(cross), run_time=0.3)
-                    self.play(FadeOut(cross), run_time=0.3)
+                    self.play(Create(cross), run_time=0.6)
+                    self.play(FadeOut(cross), run_time=0.6)
                 
                 cells[j][0].set_stroke(WHITE, width=2)
                 cells[j][0].set_z_index(0)
@@ -153,16 +153,16 @@ class BruteForce(Scene):
             self.play(
                 ReplacementTransform(prod_copy, ans_val),
                 ans_cells[i][0].animate.set_fill(GREEN, opacity=0.3),
-                run_time=0.5
+                run_time=1.0
             )
             ans_cells[i].add(ans_val)
-            self.play(FadeOut(prod_text), run_time=0.3)
+            self.play(FadeOut(prod_text), run_time=0.6)
         
-        self.play(FadeOut(i_ptr), FadeOut(j_ptr), cells[-1][0].animate.set_fill(opacity=0), run_time=0.5)
+        self.play(FadeOut(i_ptr), FadeOut(j_ptr), cells[-1][0].animate.set_fill(opacity=0), run_time=1.0)
                 
         # --- lower third ---
-        tracker.show_lower_third("Complexity Analysis", "Time: O(N²), Space: O(1)", color_type="red", position="right")
-        self.wait(3)
+        tracker.show_lower_third("Complexity Analysis", "Time: O(N²), Space: O(1)", color_type="red", position="left")
+        self.wait(6)
 
 if __name__ == "__main__":
     from manim import config

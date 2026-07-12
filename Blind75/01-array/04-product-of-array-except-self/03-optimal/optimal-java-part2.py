@@ -192,135 +192,109 @@ class OptimalJavaPart2(Scene):
         self.wait(5)
 
         # Postfix Pass
+        postfix = 1
+        postfix_label = Text("postfixProd = ", font=typo.font_code(), font_size=24, color=RED)
+        postfix_val = Text(str(postfix), font=typo.font_code(), font_size=24, color=RED)
+        postfix_text = VGroup(postfix_label, postfix_val).arrange(RIGHT, buff=0.1).next_to(ans_group, DOWN, buff=1.0)
+        self.play(FadeIn(postfix_text), run_time=0.5)
+
         for i in range(len(nums_array)-1, -1, -1):
             self.play(i_ptr.animate.next_to(ans_cells[i][0], DOWN, buff=0.2), run_time=0.3)
             
-            # Highlight i+1 to N-1 in nums
-            hl_anims = []
-            for j in range(i+1, len(nums_array)):
-                cells[j][0].set_z_index(1)
-                hl_anims.append(cells[j][0].animate.set_stroke(YELLOW, width=4))
-            if hl_anims:
-                self.play(*hl_anims, run_time=0.3)
-            
-            # Create copies
-            copies = []
-            for j in range(i+1, len(nums_array)):
-                copies.append(cells[j][1].copy())
-                
-            # Build equation postfixProd = el_i+1 x ...
             mid_y = (cells[0][0].get_y() + ans_cells[0][0].get_y()) / 2 + 0.3
-            
-            eq_items = [Text("postfixProd =", font=typo.font_code(), font_size=20, color=WHITE)]
-            if len(copies) == 0:
-                eq_items.append(Text("1", font=typo.font_code(), font_size=24, color=WHITE))
-            else:
-                for j in range(i+1, len(nums_array)):
-                    eq_items.append(Text(str(nums_array[j]), font=typo.font_code(), font_size=24, color=WHITE))
-                    if j < len(nums_array) - 1:
-                        eq_items.append(Text("×", font=typo.font_code(), font_size=24, color=WHITE))
-            
-            calc_group = VGroup(*eq_items).arrange(RIGHT, buff=0.2)
-            calc_group.set_y(mid_y)
-            calc_group.align_to(cells[0][0], LEFT)
-            
-            # Highlight current answer cell
+
+            # 1. Update postfixProd variable if i < len(nums_array) - 1
+            if i < len(nums_array) - 1:
+                cells[i+1][0].set_z_index(1)
+                self.play(cells[i+1][0].animate.set_stroke(YELLOW, width=4), run_time=0.3)
+
+                calc = VGroup(
+                    Text("postfixProd =", font=typo.font_code(), font_size=20, color=WHITE),
+                    Text(str(postfix), font=typo.font_code(), font_size=24, color=RED),
+                    Text("×", font=typo.font_code(), font_size=24, color=WHITE),
+                    Text(str(nums_array[i+1]), font=typo.font_code(), font_size=24, color=WHITE),
+                    Text("=", font=typo.font_code(), font_size=24, color=WHITE),
+                    Text(str(postfix * nums_array[i+1]), font=typo.font_code(), font_size=24, color=RED)
+                ).arrange(RIGHT, buff=0.2)
+                calc.set_y(mid_y)
+                calc.align_to(cells[0][0], LEFT)
+
+                copy_post = postfix_text[1].copy()
+                copy_num = cells[i+1][1].copy()
+
+                self.play(
+                    FadeIn(calc[0]),
+                    copy_post.animate.move_to(calc[1].get_center()),
+                    copy_num.animate.move_to(calc[3].get_center()),
+                    run_time=0.5
+                )
+                self.play(FadeIn(calc[2]), FadeIn(calc[4]), FadeIn(calc[5]), run_time=0.3)
+                self.wait(0.2)
+
+                postfix *= nums_array[i+1]
+                new_postfix_val = Text(str(postfix), font=typo.font_code(), font_size=24, color=RED).next_to(postfix_text[0], RIGHT, buff=0.1)
+
+                fade_outs = [FadeOut(calc[0]), FadeOut(calc[1]), FadeOut(calc[2]), FadeOut(calc[3]), FadeOut(calc[4]), FadeOut(copy_post), FadeOut(copy_num), FadeOut(postfix_text[1])]
+                self.play(
+                    ReplacementTransform(calc[5], new_postfix_val),
+                    *fade_outs,
+                    run_time=0.5
+                )
+                postfix_text.remove(postfix_text[1])
+                postfix_text.add(new_postfix_val)
+                self.play(cells[i+1][0].animate.set_stroke(WHITE, width=2), run_time=0.2)
+                cells[i+1][0].set_z_index(0)
+
+            # 2. Update ans[i] *= postfix
             ans_cells[i][0].set_z_index(1)
-            
-            # Animate copies to calc_group
-            self.play(
-                FadeIn(calc_group[0]),
-                ans_cells[i][0].animate.set_stroke(BLUE, width=4),
-                run_time=0.3
-            )
-            if len(copies) == 0:
-                self.play(FadeIn(calc_group[1]), run_time=0.5)
-                p_val = 1
-            else:
-                move_anims = []
-                eq_idx = 1
-                for j in range(len(copies)):
-                    move_anims.append(copies[j].animate.move_to(calc_group[eq_idx].get_center()))
-                    eq_idx += 2
-                self.play(*move_anims, run_time=0.5)
-                
-                # Show cross signs
-                cross_anims = []
-                eq_idx = 2
-                for j in range(len(copies)-1):
-                    cross_anims.append(FadeIn(calc_group[eq_idx]))
-                    eq_idx += 2
-                if cross_anims:
-                    self.play(*cross_anims, run_time=0.2)
-                
-                # Compute postfix product
-                p_val = 1
-                for j in range(i+1, len(nums_array)):
-                    p_val *= nums_array[j]
-            
-            self.wait(0.2)
-            
-            eq_res = VGroup(
-                Text("=", font=typo.font_code(), font_size=24, color=WHITE),
-                Text(str(p_val), font=typo.font_code(), font_size=24, color=RED)
-            ).arrange(RIGHT, buff=0.2).next_to(calc_group, RIGHT, buff=0.2)
-            
-            self.play(FadeIn(eq_res), run_time=0.3)
-            self.wait(0.2)
-            
-            # Now compute final: ans[i] * p_val
+            self.play(ans_cells[i][0].animate.set_stroke(BLUE, width=4), run_time=0.3)
+
             curr_val = ans_vals_array[i]
-            final_val = curr_val * p_val
-            
-            final_eq = VGroup(
+            new_val = curr_val * postfix
+            ans_vals_array[i] = new_val
+
+            calc = VGroup(
+                Text("ans[i] =", font=typo.font_code(), font_size=20, color=WHITE),
                 Text(str(curr_val), font=typo.font_code(), font_size=24, color=GREEN),
                 Text("×", font=typo.font_code(), font_size=24, color=WHITE),
-                Text(str(p_val), font=typo.font_code(), font_size=24, color=RED),
+                Text(str(postfix), font=typo.font_code(), font_size=24, color=RED),
                 Text("=", font=typo.font_code(), font_size=24, color=WHITE),
-                Text(str(final_val), font=typo.font_code(), font_size=24, color=GREEN)
+                Text(str(new_val), font=typo.font_code(), font_size=24, color=GREEN)
             ).arrange(RIGHT, buff=0.2)
-            final_eq.next_to(calc_group, DOWN, buff=0.4)
-            final_eq.align_to(calc_group, LEFT)
-            
-            copy_curr = ans_cells[i][1].copy()
-            copy_pval = eq_res[1].copy()
-            
+            calc.set_y(mid_y)
+            calc.align_to(cells[0][0], LEFT)
+
+            copy_ans = ans_cells[i][1].copy()
+            copy_post = postfix_text[1].copy()
+
             self.play(
-                copy_curr.animate.move_to(final_eq[0].get_center()),
-                copy_pval.animate.move_to(final_eq[2].get_center()),
-                FadeIn(final_eq[1]),
-                run_time=0.4
-            )
-            self.play(FadeIn(final_eq[3]), FadeIn(final_eq[4]), run_time=0.3)
-            self.wait(0.2)
-            
-            new_ans_val = Text(str(final_val), font=typo.font_code(), font_size=24, color=GREEN).move_to(ans_cells[i][0].get_center())
-            
-            fade_outs = [FadeOut(c) for c in copies] + [FadeOut(calc_group), FadeOut(eq_res), FadeOut(copy_curr), FadeOut(copy_pval), FadeOut(final_eq[1]), FadeOut(final_eq[3]), FadeOut(final_eq[0]), FadeOut(final_eq[2]), FadeOut(ans_cells[i][1])]
-            
-            self.play(
-                ReplacementTransform(final_eq[4], new_ans_val),
-                *fade_outs,
+                FadeIn(calc[0]),
+                copy_ans.animate.move_to(calc[1].get_center()),
+                copy_post.animate.move_to(calc[3].get_center()),
                 run_time=0.5
             )
-            
+            self.play(FadeIn(calc[2]), FadeIn(calc[4]), FadeIn(calc[5]), run_time=0.3)
+            self.wait(0.2)
+
+            new_ans_val = Text(str(new_val), font=typo.font_code(), font_size=24, color=GREEN).move_to(ans_cells[i][0].get_center())
+            self.play(
+                FadeOut(ans_cells[i][1]),
+                ReplacementTransform(calc[5].copy(), new_ans_val),
+                FadeOut(calc), FadeOut(copy_ans), FadeOut(copy_post),
+                run_time=0.5
+            )
             ans_cells[i].remove(ans_cells[i][1])
             ans_cells[i].insert(1, new_ans_val)
-            
-            # Unhighlight
-            un_hl_anims = [ans_cells[i][0].animate.set_stroke(WHITE, width=2)]
-            ans_cells[i][0].set_z_index(0)
-            for j in range(i+1, len(nums_array)):
-                un_hl_anims.append(cells[j][0].animate.set_stroke(WHITE, width=2))
-                cells[j][0].set_z_index(0)
-            if un_hl_anims:
-                self.play(*un_hl_anims, run_time=0.2)
 
-        self.play(FadeOut(i_ptr), run_time=0.5)
+            self.play(ans_cells[i][0].animate.set_stroke(WHITE, width=2), run_time=0.2)
+            ans_cells[i][0].set_z_index(0)
+
+        self.play(FadeOut(postfix_text), FadeOut(i_ptr), run_time=0.5)
         
         # --- lower third ---
-        tracker.show_lower_third("Complexity Analysis", "Time: O(N), Space: O(1) (excluding output array)", color_type="green", position="right")
+        tracker.show_lower_third("Complexity Analysis", "Time: O(N), Space: O(1)", color_type="green", position="left")
         self.wait(3)
+
 
 if __name__ == "__main__":
     from manim import config
